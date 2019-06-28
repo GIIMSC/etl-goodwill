@@ -8,61 +8,58 @@ from googleapiclient.errors import HttpError
 
 from config import GOOGLE_DRIVE_CREDENTIALS, SPREADSHEET_ID 
 
-SheetInfo = Dict[str, str]
-
-SheetTitle = str
-SheetTitles = List[SheetTitle]
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/documents.readonly",
 ]
 
-SHEET_RANGE_SPLIT_CHAR = "!"
 
+def build_resource(account_info: Dict):
+    """
+    This function builds a googleapiclient Resource, i.e.,
+    an object that can interact with an api, such as Google sheets ("sheets").
 
-def get_google_service(account_info: Dict, api: str, api_version: str) -> Resource:
-    """Returns a Google API Resource for a given account authorization, api type, and
-    version."""
-    credentials: Credentials = Credentials.from_service_account_info(
-        account_info, scopes=SCOPES
-    )
+    https://github.com/googleapis/google-api-python-client/blob/5c11b0a1b2658b26fe41b13ebd2e9e7b53c1ab01/googleapiclient/discovery.py#L170
+    """
+    credentials = Credentials.from_service_account_info(account_info, scopes=SCOPES)
+
     return discovery.build(
-        api,
-        api_version,
+        'sheets',
+        'v4',
         credentials=credentials,
-        cache_discovery=False,  # Silence caching warning with Google API client
+        cache_discovery=False,
     )
 
+def load_sheet(sheets_service, spreadsheet_id, range, has_header_row=True):
+    '''
+    This function retrieves the Google sheet as a list of lists.
+    It then transforms that into a more amenable data type: a list of dictionaries, wherein the
+    headers are the keys.
 
-def get_google_sheets_service(account_info: Dict) -> Resource:
-    """Returns a Google Sheets API Resource."""
-    return get_google_service(account_info, "sheets", "v4")
-
-
-def load_sheet_as_dataframe(sheets_service, spreadsheet_id, range, has_header_row=True):
-    # Try getting the sheet - if that is not possible, return an empty dataframe
-    result = (
+    Note! `sheet_as_list_of_lists` contains a collection of lists 
+    with inconsistent lengths, e.g. there are 41 headers, but some rows have 40 or fewer values.
+    This occurs because the service does not read empty cells *at the end of rows*.
+    '''
+    results = (
         sheets_service.spreadsheets()
         .values()
         .get(spreadsheetId=spreadsheet_id, range=range)
         .execute()
     )
 
-    values = result.get("values", [])
+    sheet_as_list_of_lists = results.get("values", [])
 
-    if not values:
-        return None
-    else:
-        sheet_df = pd.DataFrame.from_records(values)
-        if has_header_row:
-            sheet_df.columns = sheet_df.iloc[0].str.strip()
-            sheet_df = sheet_df.reindex(sheet_df.index.drop(0))
-        return sheet_df
+    headers = sheet_as_list_of_lists[0]
+    dataframe_obj = pd.DataFrame(sheet_as_list_of_lists, columns=headers) 
+    sheet_as_list_of_dicts = dataframe_obj.to_dict('records')
+
+    return sheet_as_list_of_dicts[1:]
 
 
-service = get_google_sheets_service(GOOGLE_DRIVE_CREDENTIALS)
+service = build_resource(GOOGLE_DRIVE_CREDENTIALS)
 
-raw_df = load_sheet_as_dataframe(service, SPREADSHEET_ID, "1:100000")
+sheet = load_sheet(service, SPREADSHEET_ID, "1:100000")
 
-print(raw_df)
+
+
