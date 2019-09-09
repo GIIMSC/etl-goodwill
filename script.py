@@ -105,11 +105,9 @@ def convert_headers(dataframe_obj):
 service = build_googleapi_resource(GOOGLE_DRIVE_CREDENTIALS)
 sheet = get_sheet_as_dataframe(service, SPREADSHEET_ID, "1:100000")
 
-
 # TRANSFORM
 df = convert_headers(sheet)
 df.drop(df.index[0], inplace=True)
-
 
 # LOAD
 # 1. Engine to connect to the database
