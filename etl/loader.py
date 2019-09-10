@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine
 from datetime import datetime
+
 import pandas as pd
+from sqlalchemy import create_engine
+
 
 class Loader:
     def __init__(self, dataframe, sqlalchemy_database_uri):
@@ -16,11 +18,14 @@ class Loader:
         '''
         with self.engine.connect() as connection:
             results = connection.execute(query)
-            last_updated = results.fetchone()['LastUpdated']
-            
-            self.dataframe['LastUpdated'] = pd.to_datetime(self.dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
-
-            return self.dataframe[self.dataframe['LastUpdated'] > last_updated]
+            try:
+                last_updated = results.fetchone()['LastUpdated']
+            except TypeError:
+                # An empty programs table return zero results, i.e., the first time running this script.
+                return self.dataframe
+            else:
+                self.dataframe['LastUpdated'] = pd.to_datetime(self.dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
+                return self.dataframe[self.dataframe['LastUpdated'] > last_updated]
 
     def _intersect_columns(self):
         filtered_df = self._filter_last_updated()
