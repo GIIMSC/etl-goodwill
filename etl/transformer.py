@@ -65,7 +65,7 @@ class Transformer:
         This function cleans the dataframe two ways: (1) replaces all empty strings with NaN (to avoid sqlalchemy "invalid input syntax for integer" Error), and (2) removes zeroeth row, which contains header names.
         '''
         df = self._make_dataframe_with_headers()
-        df.replace('', np.nan)
-        df.drop(df.index[0], inplace=True)
+        clean_df = df.replace('', np.nan)
+        clean_df.drop(clean_df.index[0], inplace=True)
 
-        return df
+        return clean_df

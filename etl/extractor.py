@@ -43,8 +43,6 @@ class Extractor:
         '''
         discovery_resource = self._build_googleapi_resource()
 
-        # Googleapiclient.discovery.Resource – an object
-        # values() – returns a list of all values in a dictionary
         results = (
             discovery_resource.spreadsheets()
             .values()
