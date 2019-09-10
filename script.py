@@ -16,6 +16,7 @@ SCOPES = [
 ]
 
 HEADER_MAPPINGS = {
+    "Timestamp": "LastUpdated",
     "Organization Name": "ProgramProvider",
     "Organization URL": "ProviderUrl",
     "Organization Address": "ProviderAddress",
@@ -155,36 +156,29 @@ table_columns = [desc[0] for desc in results.fetchall()]
 # Remove dates not current
 from datetime import datetime
 
-# TODO: 
-# Add Timestamp to Data Resource API Schema
-# Query Data Resource API for latest date.
-# Replace "now" with that value...
-
 query = '''
-    SELECT "Timestamp"
+    SELECT "LastUpdated"
     FROM programs
-    ORDER BY "Timestamp"
+    ORDER BY "LastUpdated" DESC
     LIMIT 1
 '''
 results = connection.execute(query)
+last_updated = results.fetchone()['LastUpdated']
 
-import pdb; pdb.set_trace()
-now = datetime.now()
-df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%m/%d/%Y %H:%M:%S')
-df = df[df['Timestamp'] >= now]
+df['LastUpdated'] = pd.to_datetime(df['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
 
+df = df[df['LastUpdated'] > last_updated]
 
+df1 = df[df.columns.intersection(table_columns)]
 
-
-# df1 = df[df.columns.intersection(table_columns)]
-
-# df1.to_sql('programs', 
-#     con=engine, 
-#     if_exists='append', 
-#     index=False)
+df1.to_sql('programs', 
+    con=engine, 
+    if_exists='append', 
+    index=False)
 
 # # TODO:
 # # 1. Only import recently updated data
 # # 2. Adjust the schema to properly reflect the titles, i.e., `title` field in the schema should be the same at the column name in the Google sheet. Do we want to change the column headers to be the same at the table fields?
 # # 3. Refactor
 # # 4. Tests: write some tests + test with more data...
+# # 5. Check the spreadsheets: (1) do the local sheets link to the master? and (2) do the timestamps update as expected?
