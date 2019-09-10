@@ -53,11 +53,3 @@ class Extractor:
         )
 
         return results.get("values", [])
-
-        # headers = sheet_as_list_of_lists[0]
-        # dataframe_obj = pd.DataFrame(sheet_as_list_of_lists, columns=headers) 
-        
-        # # Replace all empty strings with NaN: to avoid sqlalchemy "invalid input syntax for integer" Error.
-        # df = dataframe_obj.replace('', np.nan)
-
-        # return df
