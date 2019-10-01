@@ -5,23 +5,21 @@ from sqlalchemy import create_engine
 
 
 class Loader:
-    def __init__(self, dataframe, sqlalchemy_database_uri):
+    def __init__(self, dataframe, sqlalchemy_database_uri, spreadsheet_id):
         self.dataframe = dataframe
         self.engine = create_engine(sqlalchemy_database_uri)
+        self.spreadsheet_id = spreadsheet_id
 
     def _filter_last_updated(self):
-        # TODO: This should only consider the Goodwill being loaded:
-        # Add a source_spreadsheet_id to the schema (but hide it!)
-        # Pass that in as an attr on the loader class
-        # Add a WHERE to this query
         query = '''
             SELECT "LastUpdated"
             FROM programs
+            WHERE source_sheet_id = %s
             ORDER BY "LastUpdated" DESC
             LIMIT 1
         '''
         with self.engine.connect() as connection:
-            results = connection.execute(query)
+            results = connection.execute(query, self.spreadsheet_id)
             try:
                 last_updated = results.fetchone()['LastUpdated']
             except TypeError:
