@@ -44,8 +44,9 @@ class Transformer:
         "Anything else to add about the program?": "Miscellaneous",
     }
 
-    def __init__(self, sheet):
+    def __init__(self, sheet, spreadsheet_id):
         self.sheet = sheet
+        self.spreadsheet_id = spreadsheet_id
 
     def _make_dataframe_with_headers(self):
         '''
@@ -59,13 +60,24 @@ class Transformer:
         dataframe_obj = pd.DataFrame(self.sheet, columns=headers)
 
         return dataframe_obj.rename(index=str, columns=self.header_mappings)
+    
+    def _add_source_id(self, df):
+        df["source_sheet_id"] = self.spreadsheet_id
 
-    def clean_dataframe(self):
+        return df
+
+    def _clean_dataframe(self, df):
         '''
         This function cleans the dataframe two ways: (1) replaces all empty strings with NaN (to avoid sqlalchemy "invalid input syntax for integer" Error), and (2) removes zeroeth row, which contains header names.
         '''
-        df = self._make_dataframe_with_headers()
-        clean_df = df.replace('', np.nan)
-        clean_df.drop(clean_df.index[0], inplace=True)
+        df_clean = df.replace('', np.nan)
+        df_clean.drop(df_clean.index[0], inplace=True)
 
-        return clean_df
+        return df_clean
+    
+    def transform(self):
+        df = self._make_dataframe_with_headers()
+        df_with_source = self._add_source_id(df)
+        df_clean = self._clean_dataframe(df_with_source)
+
+        return df_clean
