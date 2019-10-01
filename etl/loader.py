@@ -10,6 +10,10 @@ class Loader:
         self.engine = create_engine(sqlalchemy_database_uri)
 
     def _filter_last_updated(self):
+        # TODO: This should only consider the Goodwill being loaded:
+        # Add a source_spreadsheet_id to the schema (but hide it!)
+        # Pass that in as an attr on the loader class
+        # Add a WHERE to this query
         query = '''
             SELECT "LastUpdated"
             FROM programs
