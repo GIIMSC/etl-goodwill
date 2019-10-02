@@ -12,13 +12,15 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
         spreadsheet_id=spreadsheet_id
     ).get_sheet_as_list()
     
-    dataframe = Transformer(
-        sheet=sheet_as_list, 
-        spreadsheet_id=spreadsheet_id
-    ).transform()
-    
-    Loader(
-        dataframe=dataframe, 
-        sqlalchemy_database_uri=SQLALCHEMY_DATABASE_URI,
-        spreadsheet_id=spreadsheet_id
-    ).load_data()
+    if sheet_as_list:
+        "----Data found"
+        dataframe = Transformer(
+            sheet=sheet_as_list, 
+            spreadsheet_id=spreadsheet_id
+        ).transform()
+        
+        Loader(
+            dataframe=dataframe, 
+            sqlalchemy_database_uri=SQLALCHEMY_DATABASE_URI,
+            spreadsheet_id=spreadsheet_id
+        ).load_data()

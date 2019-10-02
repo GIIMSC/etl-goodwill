@@ -71,9 +71,9 @@ class Transformer:
         '''
         This function removes the zeroeth row, which contains header names, from the dataframe.
         '''
-        df_clean.drop(df_clean.index[0], inplace=True)
+        df.drop(df.index[0], inplace=True)
 
-        return df_clean
+        return df
     
     def transform(self):
         df = self._make_dataframe_with_headers()
