@@ -42,6 +42,7 @@ class Transformer:
         "HS diploma required?": "IsDiplomaRequired",
         "Other prerequisites": "Prerequisites",
         "Anything else to add about the program?": "Miscellaneous",
+        "Row Identifier (DO NOT EDIT)": "gs_row_identifier",
     }
 
     def __init__(self, sheet, spreadsheet_id):
@@ -68,9 +69,8 @@ class Transformer:
 
     def _clean_dataframe(self, df):
         '''
-        This function cleans the dataframe two ways: (1) replaces all empty strings with NaN (to avoid sqlalchemy "invalid input syntax for integer" Error), and (2) removes zeroeth row, which contains header names.
+        This function removes the zeroeth row, which contains header names, from the dataframe.
         '''
-        df_clean = df.replace('', np.nan)
         df_clean.drop(df_clean.index[0], inplace=True)
 
         return df_clean
