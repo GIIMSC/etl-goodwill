@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import MetaData, Table, create_engine
+from sqlalchemy.dialects import postgresql
 
 
 class Loader:
@@ -26,7 +27,11 @@ class Loader:
                 # An empty programs table return zero results, i.e., the first time running this script.
                 return self.dataframe
             else:
-                self.dataframe['LastUpdated'] = pd.to_datetime(self.dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
+                try:
+                    self.dataframe['LastUpdated'] = pd.to_datetime(self.dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
+                except ValueError as e:
+                    self.dataframe['LastUpdated'] = pd.to_datetime(self.dataframe['LastUpdated'], format='%Y-%m-%d %H:%M:%S')
+                
                 return self.dataframe[self.dataframe['LastUpdated'] > last_updated]
 
     def _intersect_columns(self):
@@ -44,9 +49,32 @@ class Loader:
             return filtered_df[filtered_df.columns.intersection(table_columns)]
     
     def load_data(self):
+        """
+        This function uses `on_conflict_do_update` from `sqlalchemy.dialects.postgresql`, which
+        runs a query against the programs table: it either INSERTS a new row, or it UPDATES
+        existing rows.
+
+        The query looks like this:
+        ```
+        INSERT INTO programs (gs_row_identifier...) 
+        VALUES (%(gs_row_identifier)s...)
+        ON CONFLICT (gs_row_identifier)
+        DO UPDATE SET gs_row_identifier = %(param_1)s...
+        ```
+        """
         loadable_cols_df = self._intersect_columns()
-        loadable_cols_df.to_sql(
-            'programs', 
-            con=self.engine, 
-            if_exists='append', 
-            index=False)
+        loadable_dict = loadable_cols_df.to_dict(orient='records')
+
+        metadata = MetaData(bind=self.engine)
+        programs_table = Table('programs', metadata, autoload=True)
+
+        for row in loadable_dict:
+            row = { field_name: None if not value else value for field_name, value in row.items() }
+
+            with self.engine.connect() as connection:
+                sql_insert = postgresql.insert(programs_table).values(**row)
+                sql_upsert = sql_insert.on_conflict_do_update(
+                    index_elements=['gs_row_identifier'],
+                    set_=row)
+                
+                connection.execute(sql_upsert)
