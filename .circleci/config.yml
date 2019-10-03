@@ -6,7 +6,7 @@ jobs:
     working_directory: ~/etl-goodwill
     steps:
       - checkout
-      - run: echo "hello world"
+      - run: echo "hello world!"
 
   push-google-scripts:
     docker:
