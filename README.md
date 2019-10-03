@@ -49,7 +49,7 @@ clasp pull
 ```
 
 4. Commit your changes (on a branch), and push to Github for code review.
-5. Merge to master. CircleCI will push the changes to the production version of the Google scripts.
+5. Merge to master. CircleCI will push the changes to the production version of the Google scripts. How? The `Push Google Scripts` job in `.circleci/config.yml` CDs into the `google-scripts` repo, renames the script files for production, and uses `clasp` to push. CircleCi has the proper credentials by way of the `APPS_SCRIPT_CLASPRC` env variable ([saved in the CircleCI `etl-goodwill` project](https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project)). This environment variable stores login tokens generated at the time of [running `clasp login` and stored in `~/.clasprc.json`](https://www.npmjs.com/package/@google/clasp#login).
 
 ## Extracting, Transforming, and Loading Programs Data
 

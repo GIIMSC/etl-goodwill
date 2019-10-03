@@ -32,4 +32,7 @@ workflows:
   process_pr:
     jobs:
       - build
-      - push-google-scripts
+      - push-google-scripts:
+          filters:
+            branches:
+              only: master
