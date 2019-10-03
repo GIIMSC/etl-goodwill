@@ -13,7 +13,7 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
     ).get_sheet_as_list()
     
     if sheet_as_list:
-        "----Data found"
+        print("----Data found")
         dataframe = Transformer(
             sheet=sheet_as_list, 
             spreadsheet_id=spreadsheet_id
