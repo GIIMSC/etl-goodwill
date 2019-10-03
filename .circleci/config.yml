@@ -21,16 +21,12 @@ jobs:
           name: Push Google Scripts
           command: |
             cd google-scripts
-            for dir in */; do
-              pushd $dir
-              echo $APPS_SCRIPT_CLASPRC > ~/.clasprc.json
-              mv globals.js globals-dev.js
-              mv globals-prod.js globals.js
-              mv .clasp.json .clasp-dev.json
-              mv .clasp-prod.json .clasp.json
-              clasp push -f
-              popd
-            done
+            echo $APPS_SCRIPT_CLASPRC > ~/.clasprc.json
+            mv globals.js globals-dev.js
+            mv globals-prod.js globals.js
+            mv .clasp.json .clasp-dev.json
+            mv .clasp-prod.json .clasp.json
+            clasp push -f
 
 workflows:
   process_pr:
