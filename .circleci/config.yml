@@ -1,11 +1,29 @@
 version: 2.1
 jobs:
-  build:
+  push-google-scripts:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/node:10.1.0
 
     working_directory: ~/etl-goodwill
 
     steps:
       - checkout
-      - run: echo "hello world"
+
+      - run:
+          name: Install
+          command: sudo npm install @google/clasp -g
+
+      - run:
+          name: Push Google Scripts
+          command: |
+            cd google-scripts
+            for dir in */; do
+              pushd $dir
+              echo $APPS_SCRIPT_CLASPRC > ~/.clasprc.json
+              mv globals.js globals-dev.js
+              mv globals-prod.js globals.js
+              mv .clasp.json .clasp-dev.json
+              mv .clasp-prod.json .clasp.json
+              clasp push -f
+              popd
+            done
