@@ -1,18 +1,22 @@
 version: 2.1
 jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6
+    working_directory: ~/etl-goodwill
+    steps:
+      - checkout
+      - run: echo "hello world"
+
   push-google-scripts:
     docker:
       - image: circleci/node:10.1.0
-
     working_directory: ~/etl-goodwill
-
     steps:
       - checkout
-
       - run:
           name: Install
           command: sudo npm install @google/clasp -g
-
       - run:
           name: Push Google Scripts
           command: |
@@ -27,3 +31,9 @@ jobs:
               clasp push -f
               popd
             done
+
+workflows:
+  process_pr:
+    jobs:
+      - build
+      - push-google-scripts
