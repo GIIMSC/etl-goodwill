@@ -2,7 +2,7 @@
 This repo contains the necessary elements to collect, manage, and store Goodwill programs data. 
 
 ## Collecting the Programs Data 
-*This solution, devised by the Google Fellows (2018), originated in the [GoodwillDataInitiative](https://github.com/GIIMSC/GoodwillDataInitiative).*
+*This solution, devised by the Google Fellows (2019), originated in the [GoodwillDataInitiative](https://github.com/GIIMSC/GoodwillDataInitiative).*
 
 Local Goodwills collect programs data using [a Google form](https://docs.google.com/forms/d/12oKuKov-yvhhIMxgYhn3HjXUj1TM_dbp9a8tSuOVf7k/edit). The form connects to a Google sheet. This sheet (which stores all incoming form data) runs a custom script every time someone submits the form. The script writes the form data to a local-Goodwill-specific Google sheet (determined by the form value given in "Goodwill Member ID"). The ETL process pulls data from these Goodwill-specific sheets.
 
@@ -15,7 +15,7 @@ The relevant forms, sheets, and scripts mostly live in the IDC Documentation Goo
 * [Mappings (Member name --> Sheet ID)](https://docs.google.com/spreadsheets/d/1WDyh5jwRUWEa2WQy-np7Bd3oaiNPU38_uJRtpxzJrp4/edit#gid=0) – referenced in the Google script, so that the script knows where to write form data
 * [Documentation for onboarding a local Goodwill](https://docs.google.com/document/d/1ZFwhBb0d_0BDrmW2zD3KBkjx709bMpm3-Bf_3eNGix4/edit#heading=h.sfq8kx6h25fc)
 * [Google Fellows Presentation](https://docs.google.com/presentation/d/1-Q6vhtMBa8MwqNOoyVpGWntJLQFRQnzt5sgh3T4HLKY/edit#slide=id.g562a49c13a_0_96)
-* [Project scripts](https://script.google.com/u/3/home/all) - stores all Goodwill project scripts. Users must sign in as `idc_pipeline@goodwill.org`.
+* [Programs data script](https://script.google.com/a/goodwill.org/d/1KRHoj07y0IR_brLgAQvUNx73iILdhDUUC9UK04qVqz18OhooOlOY8Vgq/edit) and [other project scripts](https://script.google.com/u/3/home/all) - stores all Goodwill project scripts. Users must sign in as `idc_pipeline@goodwill.org`. The programs data script
 
 Development versions of the form, sheets, and scripts live in [a designated Google folder](https://drive.google.com/drive/u/3/folders/1i6gjLx8dsjkzjpq18lKw8fsT9-zDIDLx). Use these for TESTING changes in the form or script before pushing to production (see below).
 
