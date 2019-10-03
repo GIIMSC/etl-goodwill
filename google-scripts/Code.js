@@ -90,7 +90,7 @@ function constructEmailBody(form, responses) {
     if (question in responses) {
       email += question + ": " + responses[question] + "<br>";
     } else {
-      // If it's not in the form response, then it was a section header
+      // Questions not in the form response are section headers.
       email += "<b>" + question + "</b><br>";
     }
   }
