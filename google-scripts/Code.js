@@ -6,8 +6,7 @@ function onSubmit(e) {
   if (!memberId) {
     return;
   }
-  
-  // `getActiveSheet` returns a Sheet object (in this case, the Master sheet)
+  // `getActiveSheet` returns a Sheet object (in this case, the Master sheet).
   // https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#getactivesheet
   // https://developers.google.com/apps-script/reference/spreadsheet/sheet.html
   var masterResponsesSheet = SpreadsheetApp.openById(MASTER_RESPONSES_SHEET).getActiveSheet();
@@ -26,7 +25,7 @@ function onSubmit(e) {
     subject = "Thank you for submitting the Goodwill Programs Data form";
     email = "Your responses are shown below. To edit them, go to " + memberSheet.getUrl() + ".";
   } else {
-    subject = "There has been a problem with your programs form submission";
+    subject = "There has been a problem with your form submission";
     email = "Member id " + memberId + " has not been set up to enable programs data submission. " +
       "Please check the member ID again. Your responses are shown below.";
   }
