@@ -1,5 +1,8 @@
-import pandas as pd
+from datetime import datetime
+
 import numpy as np
+import pandas as pd
+
 
 class Transformer:
     header_mappings = {
@@ -12,36 +15,38 @@ class Transformer:
         "Population(s) Targeted": "PopulationTargeted",
         "Goal/Outcome": "Goal",
         "Time Investment": "TimeInvestment",
-        "Mission Impact Program ID": "MissionImpactProgramId",
+        "Program ID": "ProgramId",
         "Program Status": "ProgramStatus",
         "CIP Code": "CIP",
+        "Application Deadline": "ApplicationDeadline", 
         "Program Address (if different from organization address)": "ProgramAddress",
         "URL of Program": "ProgramUrl",
         "Contact phone number for program": "ContactPhone",
         "Program description": "ProgramDescription",
         "Should this program be available in Google Pathways?": "PathwaysEnabled",
-        "Cost of program, in dollars": "ProgramFees",
+        "Total cost of the program (in dollars)": "TotalCostOfProgram",
         "Duration / Time to complete": "ProgramLength",
         "Total Units": "TotalUnits",
         "Unit Cost (not required if total cost is given)": "UnitCost",
         "Format": "Format",
         "Timing": "Timing",
-        "Books, materials, supplies cost (in dollars)": "CostOfBooksAndSupplies",
         "Start date(s)": "StartDate",
-        "End date(s)": "EndDate",
+        "End Date(s)": "EndDate",
         "Credential level earned": "CredentialLevelEarned",
         "Accreditation body name": "AccreditationBodyName",
         "What certification (exam), license, or certificate (if any) does this program prepare you for or give you?": "CredentialEarned",
         "What occupations/jobs does the training prepare you for?": "RelatedOccupations",
         "Apprenticeship or Paid Training Available": "IsPaid",
-        "If yes, average hourly wage paid to student": "AverageWagePaid",
+        "If yes, average hourly wage paid to student": "AverageHourlyWagePaid",
         "Incentives": "Incentives",
-        "Salary post-graduation": "PostGradSalary",
-        "Eligibile groups": "EligibleGroups",
+        "Average ANNUAL salary post-graduation": "PostGradAnnualSalary",
+        "Average HOURLY wage post-graduation": "PostGradHourlyWage",
+        "Eligible groups": "EligibleGroups",
         "Maximum yearly household income to be eligible": "MaxIncomeEligibility",
         "HS diploma required?": "IsDiplomaRequired",
         "Other prerequisites": "Prerequisites",
         "Anything else to add about the program?": "Miscellaneous",
+        "Maximum Enrollment": "MaximumEnrollment",
         "Row Identifier (DO NOT EDIT)": "gs_row_identifier",
     }
 
@@ -75,9 +80,42 @@ class Transformer:
 
         return df
     
+    def _format_startdates_and_enddates(self, dates: str):
+        '''
+        The Goodwill intake form allows multiple responses for "Start date(s)" and "End date(s)." 
+        Specifically, the form asks: 
+
+        "Format dates as mm/dd/yyyy or mm/dd. 
+        If more than one, please separate each value with a semi-colon (e.g., 01/21/2020; 07/19/2020; 10/05/2020)."
+
+        This function splits the values into a list, and then converts each value to isoformat.
+        '''
+        def format_and_catch_exception(date):
+            try:
+                formatted_date = datetime.strptime(date.strip(), '%m/%d/%Y').date().isoformat()
+            except ValueError:
+                formatted_date = date
+            return formatted_date
+
+        dates_as_list = dates.split(';')
+        formatted_dates = [format_and_catch_exception(entry) for entry in dates_as_list]
+
+        return formatted_dates
+
+    def _handle_dates(self, df):
+        # How to handle errors, like, "ValueError: time data '' does not match format '%M/%d/%Y' (match)"
+        # df["ApplicationDeadline"] = pd.to_datetime(df['ApplicationDeadline'], format="%M/%d/%Y")        
+
+        df["StartDate"] = df["StartDate"].apply(self._format_startdates_and_enddates)
+        df["EndDate"] = df["EndDate"].apply(self._format_startdates_and_enddates)
+        
+
+        return df
+    
     def transform(self):
         df = self._make_dataframe_with_headers()
         df_with_source = self._add_source_id(df)
         df_clean = self._clean_dataframe(df_with_source)
+        df_with_valid_dates = self._handle_dates(df_clean)
 
-        return df_clean
+        return df_with_valid_dates
