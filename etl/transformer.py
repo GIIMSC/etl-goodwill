@@ -103,13 +103,10 @@ class Transformer:
         return formatted_dates
 
     def _handle_dates(self, df):
-        # How to handle errors, like, "ValueError: time data '' does not match format '%M/%d/%Y' (match)"
-        # df["ApplicationDeadline"] = pd.to_datetime(df['ApplicationDeadline'], format="%M/%d/%Y")        
-
+        df["ApplicationDeadline"] = pd.to_datetime(df['ApplicationDeadline'])        
         df["StartDate"] = df["StartDate"].apply(self._format_startdates_and_enddates)
         df["EndDate"] = df["EndDate"].apply(self._format_startdates_and_enddates)
         
-
         return df
     
     def transform(self):
