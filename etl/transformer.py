@@ -58,9 +58,6 @@ class Transformer:
         '''
         This function instantiates the Pandas dataframe with headers
         that map to the field names in the Data Resource API.
-
-        Note! We can likely remove the renaming of the dataframe (via `header_mappings`), 
-        if the Google sheet/script can be altered to match the schema.
         '''
         headers = self.sheet[0]
         dataframe_obj = pd.DataFrame(self.sheet, columns=headers)
@@ -80,6 +77,9 @@ class Transformer:
 
         return df
     
+    def _format_date(self, date: str):
+        return datetime.strptime(date.strip(), '%m/%d/%Y').date().isoformat()
+
     def _format_startdates_and_enddates(self, dates: str):
         '''
         The Goodwill intake form allows multiple responses for "Start date(s)" and "End date(s)." 
@@ -92,7 +92,7 @@ class Transformer:
         '''
         def format_and_catch_exception(date):
             try:
-                formatted_date = datetime.strptime(date.strip(), '%m/%d/%Y').date().isoformat()
+                formatted_date = self._format_date(date)
             except ValueError:
                 formatted_date = date
             return formatted_date
@@ -102,8 +102,15 @@ class Transformer:
 
         return formatted_dates
 
-    def _handle_dates(self, df):
-        df["ApplicationDeadline"] = pd.to_datetime(df['ApplicationDeadline'])        
+    def _format_date_or_invalid(self, date):
+        try:
+            formatted_date = self._format_date(date)
+        except ValueError:
+            formatted_date = self._format_date("09/09/9999")
+        return formatted_date
+
+    def _handle_dates(self, df): 
+        df["ApplicationDeadline"] = df["ApplicationDeadline"].apply(self._format_date_or_invalid)
         df["StartDate"] = df["StartDate"].apply(self._format_startdates_and_enddates)
         df["EndDate"] = df["EndDate"].apply(self._format_startdates_and_enddates)
         
