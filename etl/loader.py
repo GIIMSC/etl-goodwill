@@ -4,6 +4,7 @@ import pandas as pd
 from sqlalchemy import MetaData, Table, create_engine
 from sqlalchemy.dialects import postgresql
 
+from etl.utils.logger import logger
 
 class Loader:
     def __init__(self, dataframe, sqlalchemy_database_uri, spreadsheet_id):
@@ -72,9 +73,13 @@ class Loader:
             row = { field_name: None if not value else value for field_name, value in row.items() }
 
             with self.engine.connect() as connection:
-                sql_insert = postgresql.insert(programs_table).values(**row)
-                sql_upsert = sql_insert.on_conflict_do_update(
-                    index_elements=['gs_row_identifier'],
-                    set_=row)
-                
-                connection.execute(sql_upsert)
+                try:
+                    sql_insert = postgresql.insert(programs_table).values(**row)
+                    sql_upsert = sql_insert.on_conflict_do_update(
+                        index_elements=['gs_row_identifier'],
+                        set_=row)
+                    
+                    connection.execute(sql_upsert)
+                except Exception as e:
+                    logger.error(e)
+                    continue
