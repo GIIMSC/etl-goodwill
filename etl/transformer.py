@@ -111,8 +111,8 @@ class Transformer:
 
     def _handle_dates(self, df): 
         df["ApplicationDeadline"] = df["ApplicationDeadline"].apply(self._format_date_or_invalid)
-        df["StartDate"] = df["StartDate"].apply(self._format_startdates_and_enddates)
-        df["EndDate"] = df["EndDate"].apply(self._format_startdates_and_enddates)
+        df["StartDates"] = df["StartDates"].apply(self._format_startdates_and_enddates)
+        df["EndDates"] = df["EndDates"].apply(self._format_startdates_and_enddates)
         
         return df
     
