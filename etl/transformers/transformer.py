@@ -116,8 +116,6 @@ class Transformer:
         df["EndDates"] = df["EndDates"].apply(self._format_startdates_and_enddates)
         
         return df
-    
-
 
     def _filter_last_updated(self, dataframe):
         query = '''
@@ -142,8 +140,6 @@ class Transformer:
                 
                 return dataframe[dataframe['LastUpdated'] > last_updated]
 
-
-
     def _intersect_columns(self, dataframe):
         filtered_df = self._filter_last_updated(dataframe)
         query = '''
@@ -157,7 +153,6 @@ class Transformer:
             table_columns = [desc[0] for desc in results.fetchall()]
             
             return filtered_df[filtered_df.columns.intersection(table_columns)]
-
 
     def transform(self):
         df = self._make_dataframe_with_headers()
