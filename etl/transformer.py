@@ -50,8 +50,9 @@ class Transformer:
         "Row Identifier (DO NOT EDIT)": "gs_row_identifier",
     }
 
-    def __init__(self, sheet, spreadsheet_id):
+    def __init__(self, sheet, spreadsheet_id, engine):
         self.sheet = sheet
+        self.engine = engine
         self.spreadsheet_id = spreadsheet_id
 
     def _make_dataframe_with_headers(self):
@@ -116,10 +117,53 @@ class Transformer:
         
         return df
     
+
+
+    def _filter_last_updated(self, dataframe):
+        query = '''
+            SELECT "LastUpdated"
+            FROM programs
+            WHERE source_sheet_id = %s
+            ORDER BY "LastUpdated" DESC
+            LIMIT 1
+        '''
+        with self.engine.connect() as connection:
+            results = connection.execute(query, self.spreadsheet_id)
+            try:
+                last_updated = results.fetchone()['LastUpdated']
+            except TypeError:
+                # An empty programs table return zero results, i.e., the first time running this script.
+                return dataframe
+            else:
+                try:
+                    dataframe['LastUpdated'] = pd.to_datetime(dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
+                except ValueError as e:
+                    dataframe['LastUpdated'] = pd.to_datetime(dataframe['LastUpdated'], format='%Y-%m-%d %H:%M:%S')
+                
+                return dataframe[dataframe['LastUpdated'] > last_updated]
+
+
+
+    def _intersect_columns(self, dataframe):
+        filtered_df = self._filter_last_updated(dataframe)
+        query = '''
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+            AND table_name = 'programs';
+        '''
+        with self.engine.connect() as connection:
+            results = connection.execute(query)
+            table_columns = [desc[0] for desc in results.fetchall()]
+            
+            return filtered_df[filtered_df.columns.intersection(table_columns)]
+
+
     def transform(self):
         df = self._make_dataframe_with_headers()
         df_with_source = self._add_source_id(df)
         df_clean = self._clean_dataframe(df_with_source)
         df_with_valid_dates = self._handle_dates(df_clean)
+        loadable_df = self._intersect_columns(df_with_valid_dates)
 
-        return df_with_valid_dates
+        return loadable_df
