@@ -49,13 +49,32 @@ def test_clean_dataframe(transformer):
     ('01/15/2019; 12/15/2020; 7/01/2019', ['2019-01-15','2020-12-15', '2019-07-01']),
     ('Open Enrollment', ['Open Enrollment'])
 ])
-def test_format_startdates_and_enddates(mocker, transformer, input, expected_output):
-    # mocker.patch("sqlalchemy.create_engine", return_value=Engine)
-    
+def test_format_startdates_and_enddates(transformer, input, expected_output):
     formatted_dates = transformer._format_startdates_and_enddates(input)
 
     assert formatted_dates == expected_output
 
 
-def test_format_date_or_invalid():
+@pytest.mark.parametrize('input, expected_output', [
+    ('12/15/2019', '2019-12-15'),
+    ('09/09/9999', '9999-09-09'),
+    ('', '9999-09-09'),
+])
+def test_format_date_or_invalid(transformer, input, expected_output):
+    formatted_dates = transformer._format_date_or_invalid(input)
+
+    assert formatted_dates == expected_output
+
+
+def test_handle_dates(transformer):
+    df = transformer._make_dataframe_with_headers()
+    transformed_df = transformer._handle_dates(df)
+
+    assert transformed_df['ApplicationDeadline'][1] == '2021-01-15'
+    assert transformed_df['StartDates'][1] == ['2021-07-15']
+    assert transformed_df['EndDates'][1] == ['2021-12-15']
+
+
+def test_filter_last_updated():
     pass
+# mocker.patch("sqlalchemy.create_engine", return_value=Engine)
