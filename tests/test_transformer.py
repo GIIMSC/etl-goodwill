@@ -1,8 +1,5 @@
 import pytest
-# from sqlalchemy import MetaData, Table, create_engine
-# from sqlalchemy.engine import ResultProxy, Engine
-
-# from config.config import SQLALCHEMY_DATABASE_URI
+from sqlalchemy.engine import ResultProxy, RowProxy, Engine, Connection
 
 
 def test_make_dataframe_with_headers(transformer):
@@ -75,6 +72,22 @@ def test_handle_dates(transformer):
     assert transformed_df['EndDates'][1] == ['2021-12-15']
 
 
-def test_filter_last_updated():
-    pass
-# mocker.patch("sqlalchemy.create_engine", return_value=Engine)
+@pytest.mark.parametrize('database_last_updated,evaluates_as', [
+    ('03/19/2020 07:25:00', True),
+    ('03/16/2020 07:25:00', False)
+])
+def test_filter_last_updated(mocker, transformer, database_last_updated, evaluates_as):
+    conn = Connection(engine=transformer.engine)
+    mocker.patch("sqlalchemy.create_engine", return_value=Engine)
+    mocker.patch("sqlalchemy.engine.Engine.connect", return_value=conn)
+    mocker.patch("sqlalchemy.engine.Engine.execute", return_value=ResultProxy)
+    mocker.patch("sqlalchemy.engine.ResultProxy.fetchone", return_value={'LastUpdated': database_last_updated})
+
+    df = transformer._make_dataframe_with_headers()
+    df = transformer._clean_dataframe(df)
+    full_df_count = df.shape[0]
+
+    df = transformer._filter_last_updated(df)
+    filtered_df_count = df.shape[0]
+
+    assert (filtered_df_count < full_df_count) == evaluates_as
