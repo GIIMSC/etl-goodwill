@@ -34,8 +34,7 @@ class Extractor:
 
     def get_sheet_as_list(self):
         '''
-        This function, at first, retrieves the Google sheet as a list of lists.
-        It then transforms the sheet data into something more amenable: a Pandas dataframe.
+        This function returns the Google sheet as a list of lists.
 
         Note! `sheet_as_list_of_lists` contains a collection of lists 
         with inconsistent lengths, e.g. there are 41 headers, but some rows have 40 or fewer values.
