@@ -1,0 +1,3 @@
+repository:
+  module: etl_dagster.repository
+  fn: define_goodwill_repo

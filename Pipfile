@@ -14,6 +14,8 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 converter = {editable = true,git = "https://github.com/brighthive/google-pathways-converter.git",ref = "master"}
 usaddress = "*"
+dagster = "*"
+dagit = "*"
 
 [requires]
 python_version = "3.7"
