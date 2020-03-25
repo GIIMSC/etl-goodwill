@@ -5,10 +5,7 @@ from converter import (educational_occupational_programs_converter,
                        work_based_programs_converter)
 from etl.transformers.transformer import Transformer
 from etl.utils.logger import logger
-
-
-class InvalidPathwaysData(Exception):
-    pass
+from etl.utils.errors import InvalidPathwaysData
 
 
 class PathwaysTransformer(Transformer):
@@ -85,20 +82,19 @@ class PathwaysTransformer(Transformer):
     def transform_into_pathways_json(self):
         for row in self.dataframe.itertuples(index=True, name='Pandas'):
             gs_row_identifier = getattr(row, 'gs_row_identifier')
-            program_name = getattr(row, 'ProgramName')
             provider_address = self._make_address_blob(row)
 
             try:
                 time_to_complete = self._convert_duration_to_isoformat(getattr(row, 'ProgramLength'))
             except InvalidPathwaysData as err:
-                logger.error(f"Could not transform data for this program: {program_name} - {gs_row_identifier}")
+                logger.error(f"Could not transform data. Google Sheet Row: {gs_row_identifier}")
                 logger.error(err)
                 continue
 
             if getattr(row, 'IsPaid') == 'Yes':
                 input_kwargs = {
                     'program_description': getattr(row, 'ProgramDescription'),
-                    'program_name': program_name,
+                    'program_name': getattr(row, 'ProgramName'),
                     'program_url': getattr(row, 'ProgramUrl'), 
                     'provider_name': getattr(row, 'ProgramProvider'), 
                     'provider_url': getattr(row, 'ProviderUrl'), 
@@ -123,7 +119,7 @@ class PathwaysTransformer(Transformer):
             else:
                 input_kwargs = {
                     'application_deadline': getattr(row, 'ApplicationDeadline'), 
-                    'program_name': program_name, 
+                    'program_name': getattr(row, 'ProgramName'), 
                     'offers_price': getattr(row, 'TotalCostOfProgram'), 
                     'program_url': getattr(row, 'ProgramUrl'), 
                     'provider_name': getattr(row, 'ProgramProvider'), 
