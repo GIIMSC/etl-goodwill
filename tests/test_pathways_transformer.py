@@ -38,6 +38,7 @@ def test_make_prereq_blob_one():
     assert 'max_income_eligibility' not in results
     assert 'other_program_prerequisites' not in results
 
+
 def test_make_address_blob_for_provider_and_program():
     df = pd.DataFrame({
         'ProviderAddress': ['111 Grickle Grass Lane, Springfield MA 88884'],
@@ -51,6 +52,7 @@ def test_make_address_blob_for_provider_and_program():
     
     assert len(results) == 2
     assert expected_results == results
+
 
 def test_make_address_blob_for_provider():
     df = pd.DataFrame({

@@ -1,5 +1,5 @@
 import pytest
-from sqlalchemy.engine import ResultProxy, RowProxy, Engine, Connection
+from sqlalchemy.engine import Connection, Engine, ResultProxy, RowProxy
 
 
 def test_make_dataframe_with_headers(transformer):
