@@ -1,6 +1,8 @@
 import pandas as pd
+import pytest
 
 from etl.transformers.pathways_transformer import PathwaysTransformer
+from etl.utils.errors import InvalidPathwaysData
 
 
 def test_make_prereq_blob_all():
@@ -68,4 +70,28 @@ def test_make_address_blob_for_provider():
     assert len(results) == 1
     assert expected_results == results
 
-    
+
+@pytest.mark.parametrize('input,expected_output', [
+    ('14 days', 'P14D'),
+    ('5 weeks', 'P5W'),
+    ('6 months', 'P6M')
+])
+def test_convert_duration_to_isoformat(input, expected_output):
+    transformer = PathwaysTransformer(dataframe=pd.DataFrame({}))
+    output = transformer._convert_duration_to_isoformat(input)
+
+    assert output == expected_output
+
+
+@pytest.mark.parametrize('input', [
+    ('Full Time Permanent Employment'),
+    ('1 week'),
+    ('')
+])
+def test_convert_duration_to_isoformat_error(input):
+    transformer = PathwaysTransformer(dataframe=pd.DataFrame({}))
+
+    with pytest.raises(InvalidPathwaysData) as exceptionMsg:
+        transformer._convert_duration_to_isoformat(input)
+
+        assert 'The program does not have parseable input in "Duration / Time to complete"' in str(exceptionMsg.value)

@@ -1,0 +1,2 @@
+class InvalidPathwaysData(Exception):
+    pass
