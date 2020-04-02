@@ -159,6 +159,11 @@ class Transformer:
         df_with_source = self._add_source_id(df)
         df_clean = self._clean_dataframe(df_with_source)
         df_with_valid_dates = self._handle_dates(df_clean)
-        loadable_df = self._intersect_columns(df_with_valid_dates)
 
-        return loadable_df
+        # Comment out until we add a Programs table to the Pathways API.
+        # loadable_df = self._intersect_columns(df_with_valid_dates)
+
+        # return loadable_df
+
+
+        return df_with_valid_dates

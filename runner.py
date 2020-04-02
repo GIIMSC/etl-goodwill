@@ -3,7 +3,8 @@ from sqlalchemy import MetaData, Table, create_engine
 from config.config import (GOOGLE_DRIVE_CREDENTIALS, SPREADSHEET_IDS,
                            SQLALCHEMY_DATABASE_URI)
 from etl.extractor import Extractor
-from etl.loader import Loader
+from etl.loaders.loader import Loader
+from etl.loaders.pathways_loader import PathwaysLoader
 from etl.transformers.transformer import Transformer
 from etl.transformers.pathways_transformer import PathwaysTransformer
 from etl.utils.logger import logger
@@ -27,9 +28,10 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
             engine=engine
         ).transform()
         
-        PathwaysTransformer(
+        pathways_dataframe = PathwaysTransformer(
             dataframe=dataframe
-        ).transform_into_pathways_json()
+        ).pathways_transform()
+
         # Loader(
         #     dataframe=dataframe, 
         #     engine=engine
