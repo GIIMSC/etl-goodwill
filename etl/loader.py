@@ -1,15 +1,13 @@
-from datetime import datetime
-
-import pandas as pd
-from sqlalchemy import MetaData, Table, create_engine
+from sqlalchemy import MetaData, Table
 from sqlalchemy.dialects import postgresql
 
 from etl.utils.logger import logger
 
 class Loader:
-    def __init__(self, dataframe, engine):
+    def __init__(self, dataframe, engine, table_name):
         self.dataframe = dataframe
         self.engine = engine
+        self.table_name = table_name
     
     def load_data(self):
         """
@@ -28,7 +26,7 @@ class Loader:
         loadable_dict = self.dataframe.to_dict(orient='records')
 
         metadata = MetaData(bind=self.engine)
-        programs_table = Table('programs', metadata, autoload=True)
+        programs_table = Table(self.table_name, metadata, autoload=True)
 
         for row in loadable_dict:
             row = { field_name: None if not value else value for field_name, value in row.items() }
