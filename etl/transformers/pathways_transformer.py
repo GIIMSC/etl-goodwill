@@ -157,7 +157,7 @@ class PathwaysTransformer(Transformer):
         for list_with_pathways_program in self._convert_to_pathways_json():
             list_of_lists.append(list_with_pathways_program)
         
-        headers = ['gs_row_identifier', 'updated_at', 'pathways_program']
+        headers = ['id', 'updated_at', 'pathways_program']
         dataframe_obj = pd.DataFrame(list_of_lists, columns=headers)
         
         return dataframe_obj

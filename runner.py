@@ -12,7 +12,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
 
 for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
-    logger.info("----Running ETL for {}".format(goodwill))
+    logger.info('----Running ETL for {}'.format(goodwill))
     
     sheet_as_list = Extractor(
         google_account_info=GOOGLE_DRIVE_CREDENTIALS, 
@@ -20,7 +20,7 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
     ).get_sheet_as_list()
     
     if sheet_as_list:
-        logger.info("----Data found")
+        logger.info('----Data found')
         dataframe = Transformer(
             sheet=sheet_as_list, 
             spreadsheet_id=spreadsheet_id,
@@ -31,14 +31,15 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
             dataframe=dataframe
         ).pathways_transform()
 
-        Loader(
+        loader = Loader(engine=engine)
+        loader.load_data(
             dataframe=pathways_dataframe, 
-            engine=engine,
-            table_name="pathways_program"
-        ).load_data()
+            table_name='pathways_program',
+            primary_key='id'
+        )
 
-        # Loader(
+        # loader.load_data(
         #     dataframe=dataframe, 
-        #     engine=engine,
-        #     table_name="programs"
-        # ).load_data()
+        #     table_name='programs',
+        #     primary_key='gs_row_identifier'
+        # )
