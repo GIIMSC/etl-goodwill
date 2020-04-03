@@ -1,11 +1,13 @@
 import re
+
+import pandas as pd
 import usaddress
 
 from converter import (educational_occupational_programs_converter,
                        work_based_programs_converter)
 from etl.transformers.transformer import Transformer
-from etl.utils.logger import logger
 from etl.utils.errors import InvalidPathwaysData
+from etl.utils.logger import logger
 
 
 class PathwaysTransformer(Transformer):
@@ -79,7 +81,7 @@ class PathwaysTransformer(Transformer):
         return duration_in_isoformat
     
 
-    def transform_into_pathways_json(self):
+    def _convert_to_pathways_json(self):
         for row in self.dataframe.itertuples(index=True, name='Pandas'):
             gs_row_identifier = getattr(row, 'gs_row_identifier')
             provider_address = self._make_address_blob(row)
@@ -126,7 +128,7 @@ class PathwaysTransformer(Transformer):
                     'provider_url': getattr(row, 'ProviderUrl'), 
                     'provider_telephone': getattr(row, 'ContactPhone'), 
                     'provider_address': provider_address, 
-                    'time_to_complete': '', # TODO: How are we going to handle ProgramLength? 
+                    'time_to_complete': '', 
                     'identifier_cip': getattr(row, 'CIP'), 
                     'identifier_program_id': getattr(row, 'ProgramId'),   
                     'start_date': getattr(row, 'StartDates'), # I think this is a list?
@@ -142,4 +144,20 @@ class PathwaysTransformer(Transformer):
 
                 pathways_json_ld = educational_occupational_programs_converter(**input_kwargs)
             
-            return pathways_json_ld
+            yield [gs_row_identifier, getattr(row, 'LastUpdated'), pathways_json_ld]
+    
+    def pathways_transform(self):
+        '''
+        This function consolidates the programs data into a "list of lists" (i.e., the same
+        data type the Google API resource returns). Thus, we can 
+        easily make use of the functions in the Transformer parent class.
+        '''
+        list_of_lists = []
+
+        for list_with_pathways_program in self._convert_to_pathways_json():
+            list_of_lists.append(list_with_pathways_program)
+        
+        headers = ['id', 'updated_at', 'pathways_program']
+        dataframe_obj = pd.DataFrame(list_of_lists, columns=headers)
+        
+        return dataframe_obj

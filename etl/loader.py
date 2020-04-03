@@ -1,17 +1,14 @@
-from datetime import datetime
-
-import pandas as pd
-from sqlalchemy import MetaData, Table, create_engine
+from sqlalchemy import MetaData, Table
 from sqlalchemy.dialects import postgresql
 
 from etl.utils.logger import logger
 
 class Loader:
-    def __init__(self, dataframe, engine):
-        self.dataframe = dataframe
+    def __init__(self, engine):
         self.engine = engine
+
     
-    def load_data(self):
+    def load_data(self, dataframe, table_name, primary_key):
         """
         This function uses `on_conflict_do_update` from `sqlalchemy.dialects.postgresql`, which
         runs a query against the programs table: it either INSERTS a new row, or it UPDATES
@@ -25,10 +22,10 @@ class Loader:
         DO UPDATE SET gs_row_identifier = %(param_1)s...
         ```
         """
-        loadable_dict = self.dataframe.to_dict(orient='records')
+        loadable_dict = dataframe.to_dict(orient='records')
 
         metadata = MetaData(bind=self.engine)
-        programs_table = Table('programs', metadata, autoload=True)
+        programs_table = Table(table_name, metadata, autoload=True)
 
         for row in loadable_dict:
             row = { field_name: None if not value else value for field_name, value in row.items() }
@@ -37,7 +34,7 @@ class Loader:
                 try:
                     sql_insert = postgresql.insert(programs_table).values(**row)
                     sql_upsert = sql_insert.on_conflict_do_update(
-                        index_elements=['gs_row_identifier'],
+                        index_elements=[primary_key],
                         set_=row)
                     
                     connection.execute(sql_upsert)

@@ -76,10 +76,16 @@ def test_handle_dates(transformer):
     ('03/19/2020 07:25:00', True),
     ('03/16/2020 07:25:00', False)
 ])
-def test_filter_last_updated(mocker, transformer, database_last_updated, evaluates_as):
-    conn = Connection(engine=transformer.engine)
+def test_filter_last_updated(mocker, connection_mock, transformer, database_last_updated, evaluates_as):
+    '''
+    How does this test work? 
+    
+    The `google_sheet_data` fixture has "03/18/2020 07:25:37" as the LastUpdated value. 
+    This test mocks the return value of `results.fetchone()` with
+    a value that is either higher or lower than the "03/18/2020 07:25:37" (LastUpdated).
+    '''
     mocker.patch("sqlalchemy.create_engine", return_value=Engine)
-    mocker.patch("sqlalchemy.engine.Engine.connect", return_value=conn)
+    mocker.patch("sqlalchemy.engine.Engine.connect", return_value=connection_mock)
     mocker.patch("sqlalchemy.engine.Engine.execute", return_value=ResultProxy)
     mocker.patch("sqlalchemy.engine.ResultProxy.fetchone", return_value={'LastUpdated': database_last_updated})
 
