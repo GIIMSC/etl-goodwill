@@ -122,6 +122,7 @@ class PathwaysTransformer(Transformer):
                 input_kwargs = {
                     'application_deadline': getattr(row, 'ApplicationDeadline'), 
                     'program_name': getattr(row, 'ProgramName'), 
+                    'program_description': getattr(row, 'ProgramDescription'),
                     'offers_price': getattr(row, 'TotalCostOfProgram'), 
                     'program_url': getattr(row, 'ProgramUrl'), 
                     'provider_name': getattr(row, 'ProgramProvider'), 
@@ -143,7 +144,7 @@ class PathwaysTransformer(Transformer):
                     input_kwargs['program_prerequisites'] = prereq_blob
 
                 pathways_json_ld = educational_occupational_programs_converter(**input_kwargs)
-            
+
             yield [gs_row_identifier, getattr(row, 'LastUpdated'), pathways_json_ld]
     
     def pathways_transform(self):
