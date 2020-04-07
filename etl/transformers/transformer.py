@@ -107,7 +107,7 @@ class Transformer:
         try:
             formatted_date = self._format_date(date)
         except ValueError:
-            formatted_date = self._format_date("09/09/9999")
+            formatted_date = self._format_date("09/09/2099")
         return formatted_date
 
     def _handle_dates(self, df): 
