@@ -31,12 +31,12 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
             dataframe=dataframe
         ).pathways_transform()
 
-        loader = Loader(engine=engine)
-        loader.load_data(
-            dataframe=pathways_dataframe, 
-            table_name='pathways_program',
-            primary_key='id'
-        )
+        # loader = Loader(engine=engine)
+        # loader.load_data(
+        #     dataframe=pathways_dataframe, 
+        #     table_name='pathways_program',
+        #     primary_key='id'
+        # )
 
         # loader.load_data(
         #     dataframe=dataframe, 

@@ -89,7 +89,7 @@ class PathwaysTransformer(Transformer):
             try:
                 time_to_complete = self._convert_duration_to_isoformat(getattr(row, 'ProgramLength'))
             except InvalidPathwaysData as err:
-                logger.error(f"Could not transform data. Google Sheet Row: {gs_row_identifier}")
+                logger.error(f"Could not transform data for Google Sheet Row: {gs_row_identifier}. See below error.")
                 logger.error(err)
                 continue
 
@@ -117,11 +117,18 @@ class PathwaysTransformer(Transformer):
                 if prereq_blob:
                     input_kwargs['program_prerequisites'] = prereq_blob
 
-                pathways_json_ld = work_based_programs_converter(**input_kwargs)
+                try:
+                    pathways_json_ld = work_based_programs_converter(**input_kwargs)
+                except ValueError as err:
+                    logger.error(f"Could not transform data for Google Sheet Row: {gs_row_identifier}. See below error.")
+                    logger.error(err)
+                    continue
+
             else:
                 input_kwargs = {
                     'application_deadline': getattr(row, 'ApplicationDeadline'), 
                     'program_name': getattr(row, 'ProgramName'), 
+                    'program_description': getattr(row, 'ProgramDescription'),
                     'offers_price': getattr(row, 'TotalCostOfProgram'), 
                     'program_url': getattr(row, 'ProgramUrl'), 
                     'provider_name': getattr(row, 'ProgramProvider'), 
@@ -142,8 +149,13 @@ class PathwaysTransformer(Transformer):
                 if prereq_blob:
                     input_kwargs['program_prerequisites'] = prereq_blob
 
-                pathways_json_ld = educational_occupational_programs_converter(**input_kwargs)
-            
+                try:
+                    pathways_json_ld = educational_occupational_programs_converter(**input_kwargs)
+                except ValueError as err:
+                    logger.error(f"Could not transform data for Google Sheet Row: {gs_row_identifier}. See below error.")
+                    logger.error(err)
+                    continue
+
             yield [gs_row_identifier, getattr(row, 'LastUpdated'), pathways_json_ld]
     
     def pathways_transform(self):
@@ -159,5 +171,5 @@ class PathwaysTransformer(Transformer):
         
         headers = ['id', 'updated_at', 'pathways_program']
         dataframe_obj = pd.DataFrame(list_of_lists, columns=headers)
-        
+
         return dataframe_obj
