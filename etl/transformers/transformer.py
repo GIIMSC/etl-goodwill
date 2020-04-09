@@ -5,50 +5,50 @@ import pandas as pd
 
 
 class Transformer:
-    header_mappings = {
-        "Timestamp": "LastUpdated",
-        "Organization Name": "ProgramProvider",
-        "Organization URL": "ProviderUrl",
-        "Organization Address": "ProviderAddress",
-        "Program Name": "ProgramName",
-        "Program Category": "ProgramCategory", 
-        "Population(s) Targeted": "PopulationTargeted",
-        "Goal/Outcome": "Goal",
-        "Time Investment": "TimeInvestment",
-        "Program ID": "ProgramId",
-        "Program Status": "ProgramStatus",
-        "CIP Code": "CIP",
-        "Application Deadline": "ApplicationDeadline", 
-        "Program Address (if different from organization address)": "ProgramAddress",
-        "URL of Program": "ProgramUrl",
-        "Contact phone number for program": "ContactPhone",
-        "Program description": "ProgramDescription",
-        "Should this program be available in Google Pathways?": "PathwaysEnabled",
-        "Total cost of the program (in dollars)": "TotalCostOfProgram",
-        "Duration / Time to complete": "ProgramLength",
-        "Total Units": "TotalUnits",
-        "Unit Cost (not required if total cost is given)": "UnitCost",
-        "Format": "Format",
-        "Timing": "Timing",
-        "Start date(s)": "StartDates",
-        "End Date(s)": "EndDates",
-        "Credential level earned": "CredentialLevelEarned",
-        "Accreditation body name": "AccreditationBodyName",
-        "What certification (exam), license, or certificate (if any) does this program prepare you for or give you?": "CredentialEarned",
-        "What occupations/jobs does the training prepare you for?": "RelatedOccupations",
-        "Apprenticeship or Paid Training Available": "IsPaid",
-        "If yes, average hourly wage paid to student": "AverageHourlyWagePaid",
-        "Incentives": "Incentives",
-        "Average ANNUAL salary post-graduation": "PostGradAnnualSalary",
-        "Average HOURLY wage post-graduation": "PostGradHourlyWage",
-        "Eligible groups": "EligibleGroups",
-        "Maximum yearly household income to be eligible": "MaxIncomeEligibility",
-        "HS diploma required?": "IsDiplomaRequired",
-        "Other prerequisites": "Prerequisites",
-        "Anything else to add about the program?": "Miscellaneous",
-        "Maximum Enrollment": "MaximumEnrollment",
-        "Row Identifier (DO NOT EDIT)": "gs_row_identifier",
-    }
+    # header_mappings = {
+    #     "Timestamp": "LastUpdated",
+    #     "Organization Name": "ProgramProvider",
+    #     "Organization URL": "ProviderUrl",
+    #     "Organization Address": "ProviderAddress",
+    #     "Program Name": "ProgramName",
+    #     "Program Category": "ProgramCategory", 
+    #     "Population(s) Targeted": "PopulationTargeted",
+    #     "Goal/Outcome": "Goal",
+    #     "Time Investment": "TimeInvestment",
+    #     "Program ID": "ProgramId",
+    #     "Program Status": "ProgramStatus",
+    #     "CIP Code": "CIP",
+    #     "Application Deadline": "ApplicationDeadline", 
+    #     "Program Address (if different from organization address)": "ProgramAddress",
+    #     "URL of Program": "ProgramUrl",
+    #     "Contact phone number for program": "ContactPhone",
+    #     "Program description": "ProgramDescription",
+    #     "Should this program be available in Google Pathways?": "PathwaysEnabled",
+    #     "Total cost of the program (in dollars)": "TotalCostOfProgram",
+    #     "Duration / Time to complete": "ProgramLength",
+    #     "Total Units": "TotalUnits",
+    #     "Unit Cost (not required if total cost is given)": "UnitCost",
+    #     "Format": "Format",
+    #     "Timing": "Timing",
+    #     "Start date(s)": "StartDates",
+    #     "End Date(s)": "EndDates",
+    #     "Credential level earned": "CredentialLevelEarned",
+    #     "Accreditation body name": "AccreditationBodyName",
+    #     "What certification (exam), license, or certificate (if any) does this program prepare you for or give you?": "CredentialEarned",
+    #     "What occupations/jobs does the training prepare you for?": "RelatedOccupations",
+    #     "Apprenticeship or Paid Training Available": "IsPaid",
+    #     "If yes, average hourly wage paid to student": "AverageHourlyWagePaid",
+    #     "Incentives": "Incentives",
+    #     "Average ANNUAL salary post-graduation": "PostGradAnnualSalary",
+    #     "Average HOURLY wage post-graduation": "PostGradHourlyWage",
+    #     "Eligible groups": "EligibleGroups",
+    #     "Maximum yearly household income to be eligible": "MaxIncomeEligibility",
+    #     "HS diploma required?": "IsDiplomaRequired",
+    #     "Other prerequisites": "Prerequisites",
+    #     "Anything else to add about the program?": "Miscellaneous",
+    #     "Maximum Enrollment": "MaximumEnrollment",
+    #     "Row Identifier (DO NOT EDIT)": "gs_row_identifier",
+    # }
 
     def __init__(self, sheet, spreadsheet_id, engine):
         self.sheet = sheet
@@ -57,26 +57,34 @@ class Transformer:
 
     def _make_dataframe_with_headers(self):
         '''
-        This function instantiates the Pandas dataframe with headers
-        that map to the field names in the Data Resource API.
+        This function converts the list of lists into a Pandas dataframe 
+        with headers (and without a zeroeth row that contains header names).
         '''
         headers = self.sheet[0]
-        dataframe_obj = pd.DataFrame(self.sheet, columns=headers)
-
-        return dataframe_obj.rename(index=str, columns=self.header_mappings)
-    
-    def _add_source_id(self, df):
-        df["source_sheet_id"] = self.spreadsheet_id
-
-        return df
-
-    def _clean_dataframe(self, df):
-        '''
-        This function removes the zeroeth row, which contains header names, from the dataframe.
-        '''
+        
+        df = pd.DataFrame(self.sheet, columns=headers)
         df.drop(df.index[0], inplace=True)
 
         return df
+
+        # FIX 1: do not convert headers
+        # return dataframe_obj.rename(index=str, columns=self.header_mappings)
+    
+
+    # FIX 3: Not necessary if we pull from one spreadsheet
+    # def _add_source_id(self, df):
+    #     df["source_sheet_id"] = self.spreadsheet_id
+
+    #     return df
+
+    # FIX 2: Moved into _make_dataframe....
+    # def _clean_dataframe(self, df):
+    #     '''
+    #     This function removes the zeroeth row, which contains header names, from the dataframe.
+    #     '''
+    #     df.drop(df.index[0], inplace=True)
+
+    #     return df
     
     def _format_date(self, date: str):
         return datetime.strptime(date.strip(), '%m/%d/%Y').date().isoformat()
@@ -103,6 +111,7 @@ class Transformer:
 
         return formatted_dates
 
+
     def _format_date_or_invalid(self, date):
         try:
             formatted_date = self._format_date(date)
@@ -110,60 +119,71 @@ class Transformer:
             formatted_date = self._format_date("09/09/2099")
         return formatted_date
 
+
     def _handle_dates(self, df): 
-        df["ApplicationDeadline"] = df["ApplicationDeadline"].apply(self._format_date_or_invalid)
-        df["StartDates"] = df["StartDates"].apply(self._format_startdates_and_enddates)
-        df["EndDates"] = df["EndDates"].apply(self._format_startdates_and_enddates)
+        df["Application Deadline"] = df["Application Deadline"].apply(self._format_date_or_invalid)
+        df["Start date(s)"] = df["Start date(s)"].apply(self._format_startdates_and_enddates)
+        df["End Date(s)"] = df["End Date(s)"].apply(self._format_startdates_and_enddates)
         
         return df
 
+
     def _filter_last_updated(self, dataframe):
+        # query = '''
+        #     SELECT updated_at
+        #     FROM programs
+        #     WHERE source_sheet_id = %s
+        #     ORDER BY updated_at DESC
+        #     LIMIT 1
+        # '''
         query = '''
-            SELECT "LastUpdated"
-            FROM programs
-            WHERE source_sheet_id = %s
-            ORDER BY "LastUpdated" DESC
+            SELECT updated_at
+            FROM pathways_program
+            ORDER BY updated_at DESC
             LIMIT 1
         '''
         with self.engine.connect() as connection:
             results = connection.execute(query, self.spreadsheet_id)
             try:
-                last_updated = results.fetchone()['LastUpdated']
+                last_updated = results.fetchone()['updated_at']
             except TypeError:
                 # An empty programs table return zero results, i.e., the first time running this script.
                 return dataframe
             else:
                 try:
-                    dataframe['LastUpdated'] = pd.to_datetime(dataframe['LastUpdated'], format='%m/%d/%Y %H:%M:%S')
+                    dataframe['Timestamp'] = pd.to_datetime(dataframe['Timestamp'], format='%m/%d/%Y %H:%M:%S')
                 except ValueError as e:
-                    dataframe['LastUpdated'] = pd.to_datetime(dataframe['LastUpdated'], format='%Y-%m-%d %H:%M:%S')
+                    dataframe['Timestamp'] = pd.to_datetime(dataframe['Timestamp'], format='%Y-%m-%d %H:%M:%S')
                 
-                return dataframe[dataframe['LastUpdated'] > last_updated]
+                return dataframe[dataframe['Timestamp'] > last_updated]
 
-    def _intersect_columns(self, dataframe):
-        filtered_df = self._filter_last_updated(dataframe)
-        query = '''
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-            AND table_name = 'programs';
-        '''
-        with self.engine.connect() as connection:
-            results = connection.execute(query)
-            table_columns = [desc[0] for desc in results.fetchall()]
+
+    # FIX: We do not need this for pathways loading...
+    # def _intersect_columns(self, dataframe):
+    #     filtered_df = self._filter_last_updated(dataframe)
+    #     query = '''
+    #         SELECT column_name
+    #         FROM information_schema.columns
+    #         WHERE table_schema = 'public'
+    #         AND table_name = 'pathways_program';
+    #     '''
+    #     with self.engine.connect() as connection:
+    #         results = connection.execute(query)
+    #         table_columns = [desc[0] for desc in results.fetchall()]
             
-            return filtered_df[filtered_df.columns.intersection(table_columns)]
+    #         return filtered_df[filtered_df.columns.intersection(table_columns)]
+
 
     def transform(self):
         df = self._make_dataframe_with_headers()
-        df_with_source = self._add_source_id(df)
-        df_clean = self._clean_dataframe(df_with_source)
-        df_with_valid_dates = self._handle_dates(df_clean)
+        # df_with_source = self._add_source_id(df)
+        # df_clean = self._clean_dataframe(df_with_source)
+        df_with_valid_dates = self._handle_dates(df)
 
         # Comment out until we add a Programs table to the Pathways API.
         # loadable_df = self._intersect_columns(df_with_valid_dates)
+        clean_df = self._filter_last_updated(df_with_valid_dates)
 
         # return loadable_df
 
-
-        return df_with_valid_dates
+        return clean_df

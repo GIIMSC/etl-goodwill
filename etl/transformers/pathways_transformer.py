@@ -18,17 +18,17 @@ class PathwaysTransformer(Transformer):
     def _make_prereq_blob(self, row):
         prereq_blob = {}
 
-        if getattr(row, 'IsDiplomaRequired'):
+        if getattr(row, 'HS diploma required?'):
             prereq_blob['credential_category'] = 'HighSchool'
         
-        if getattr(row, 'EligibleGroups'):
-            prereq_blob['eligible_groups'] = getattr(row, 'EligibleGroups')
+        if getattr(row, 'Eligible groups'):
+            prereq_blob['eligible_groups'] = getattr(row, 'Eligible groups')
         
-        if getattr(row, 'MaxIncomeEligibility'):
-            prereq_blob['max_income_eligibility'] = getattr(row, 'MaxIncomeEligibility')
+        if getattr(row, 'Maximum yearly household income to be eligible'):
+            prereq_blob['max_income_eligibility'] = getattr(row, 'Maximum yearly household income to be eligible')
 
-        if getattr(row, 'Prerequisites'):
-            prereq_blob['other_program_prerequisites'] = getattr(row, 'Prerequisites')
+        if getattr(row, 'Other prerequisites'):
+            prereq_blob['other_program_prerequisites'] = getattr(row, 'Other prerequisites')
         
         return prereq_blob
 
@@ -47,8 +47,8 @@ class PathwaysTransformer(Transformer):
             }
 
         provider_address_list = []
-        provider_address = getattr(row, 'ProviderAddress')
-        program_address = getattr(row, 'ProgramAddress')
+        provider_address = getattr(row, 'Organization Address')
+        program_address = getattr(row, 'Program Address (if different from organization address)')
         
         try:
             parsed_provider_address = parse_address(provider_address)
@@ -82,35 +82,37 @@ class PathwaysTransformer(Transformer):
     
 
     def _convert_to_pathways_json(self):
-        for row in self.dataframe.itertuples(index=True, name='Pandas'):
-            gs_row_identifier = getattr(row, 'gs_row_identifier')
+        for index, row in self.dataframe.iterrows():
+        # for row in self.dataframe.itertuples(index=True, name='Pandas'):
+            gs_row_identifier = getattr(row, 'Row Identifier (DO NOT EDIT)')
             provider_address = self._make_address_blob(row)
 
             try:
-                time_to_complete = self._convert_duration_to_isoformat(getattr(row, 'ProgramLength'))
+                time_to_complete = self._convert_duration_to_isoformat(getattr(row, 'Duration / Time to complete'))
             except InvalidPathwaysData as err:
                 logger.error(f"Could not transform data for Google Sheet Row: {gs_row_identifier}. See below error.")
                 logger.error(err)
                 continue
 
-            if getattr(row, 'IsPaid') == 'Yes':
+            if getattr(row, 'Apprenticeship or Paid Training Available') == 'Yes':
+                import pdb; pdb.set_trace()
                 input_kwargs = {
-                    'program_description': getattr(row, 'ProgramDescription'),
-                    'program_name': getattr(row, 'ProgramName'),
-                    'program_url': getattr(row, 'ProgramUrl'), 
-                    'provider_name': getattr(row, 'ProgramProvider'), 
-                    'provider_url': getattr(row, 'ProviderUrl'), 
-                    'provider_telephone': getattr(row, 'ContactPhone'), 
+                    'program_description': getattr(row, 'Program description'),
+                    'program_name': getattr(row, 'Program Name'),
+                    'program_url': getattr(row, 'URL of Program'), 
+                    'provider_name': getattr(row, 'Organization Name'), 
+                    'provider_url': getattr(row, 'Organization URL'), 
+                    'provider_telephone': getattr(row, 'Contact phone number for program'), 
                     'provider_address': provider_address, 
-                    'start_date': getattr(row, 'StartDates'), # I think this is a list?
-                    'end_date': getattr(row, 'EndDates'), # I think this is a list?
-                    'maximum_enrollment': getattr(row, 'MaximumEnrollment'), 
-                    'occupational_credential_awarded': getattr(row, 'CredentialEarned'), 
+                    'start_date': getattr(row, 'Start date(s)'), # I think this is a list?
+                    'end_date': getattr(row, 'End Date(s)'), # I think this is a list?
+                    'maximum_enrollment': getattr(row, 'Maximum Enrollment'), 
+                    'occupational_credential_awarded': getattr(row, 'What certification (exam), license, or certificate (if any) does this program prepare you for or give you?'), 
                     'time_of_day': getattr(row, 'Timing'),
                     'time_to_complete': time_to_complete, 
-                    'offers_price': getattr(row, 'TotalCostOfProgram'),
-                    'training_salary': getattr(row, 'AverageHourlyWagePaid'),
-                    'salary_upon_completion': getattr(row, 'PostGradAnnualSalary')
+                    'offers_price': getattr(row, 'Total cost of the program (in dollars)'),
+                    'training_salary': getattr(row, 'If yes, average hourly wage paid to student'),
+                    'salary_upon_completion': getattr(row, 'Average ANNUAL salary post-graduation')
                 }
 
                 prereq_blob = self._make_prereq_blob(row)
@@ -126,22 +128,22 @@ class PathwaysTransformer(Transformer):
 
             else:
                 input_kwargs = {
-                    'application_deadline': getattr(row, 'ApplicationDeadline'), 
-                    'program_name': getattr(row, 'ProgramName'), 
-                    'program_description': getattr(row, 'ProgramDescription'),
-                    'offers_price': getattr(row, 'TotalCostOfProgram'), 
-                    'program_url': getattr(row, 'ProgramUrl'), 
-                    'provider_name': getattr(row, 'ProgramProvider'), 
-                    'provider_url': getattr(row, 'ProviderUrl'), 
-                    'provider_telephone': getattr(row, 'ContactPhone'), 
+                    'application_deadline': getattr(row, 'Application Deadline'), 
+                    'program_name': getattr(row, 'Program Name'), 
+                    'program_description': getattr(row, 'Program description'),
+                    'offers_price': getattr(row, 'Total cost of the program (in dollars)'), 
+                    'program_url': getattr(row, 'URL of Program'), 
+                    'provider_name': getattr(row, 'Organization Name'), 
+                    'provider_url': getattr(row, 'Organization URL'), 
+                    'provider_telephone': getattr(row, 'Contact phone number for program'), 
                     'provider_address': provider_address, 
-                    'time_to_complete': '', 
-                    'identifier_cip': getattr(row, 'CIP'), 
-                    'identifier_program_id': getattr(row, 'ProgramId'),   
-                    'start_date': getattr(row, 'StartDates'), # I think this is a list?
-                    'end_date': getattr(row, 'EndDates'), # I think this is a list?
-                    'occupational_credential_awarded': getattr(row, 'CredentialEarned'), 
-                    'maximum_enrollment': getattr(row, 'MaximumEnrollment'), 
+                    'time_to_complete': time_to_complete, 
+                    'identifier_cip': getattr(row, 'CIP Code'), 
+                    'identifier_program_id': getattr(row, 'Program ID'),   
+                    'start_date': getattr(row, 'Start date(s)'), # I think this is a list?
+                    'end_date': getattr(row, 'End Date(s)'), # I think this is a list?
+                    'occupational_credential_awarded': getattr(row, 'What certification (exam), license, or certificate (if any) does this program prepare you for or give you?'), 
+                    'maximum_enrollment': getattr(row, 'Maximum Enrollment'), 
                     'time_of_day': getattr(row, 'Timing')
                 }
 
@@ -156,7 +158,7 @@ class PathwaysTransformer(Transformer):
                     logger.error(err)
                     continue
 
-            yield [gs_row_identifier, getattr(row, 'LastUpdated'), pathways_json_ld]
+            yield [gs_row_identifier, getattr(row, 'Timestamp'), pathways_json_ld]
     
     def pathways_transform(self):
         '''
