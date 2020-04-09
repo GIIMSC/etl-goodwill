@@ -67,25 +67,6 @@ class Transformer:
 
         return df
 
-        # FIX 1: do not convert headers
-        # return dataframe_obj.rename(index=str, columns=self.header_mappings)
-    
-
-    # FIX 3: Not necessary if we pull from one spreadsheet
-    # def _add_source_id(self, df):
-    #     df["source_sheet_id"] = self.spreadsheet_id
-
-    #     return df
-
-    # FIX 2: Moved into _make_dataframe....
-    # def _clean_dataframe(self, df):
-    #     '''
-    #     This function removes the zeroeth row, which contains header names, from the dataframe.
-    #     '''
-    #     df.drop(df.index[0], inplace=True)
-
-    #     return df
-    
     def _format_date(self, date: str):
         return datetime.strptime(date.strip(), '%m/%d/%Y').date().isoformat()
 
@@ -129,13 +110,6 @@ class Transformer:
 
 
     def _filter_last_updated(self, dataframe):
-        # query = '''
-        #     SELECT updated_at
-        #     FROM programs
-        #     WHERE source_sheet_id = %s
-        #     ORDER BY updated_at DESC
-        #     LIMIT 1
-        # '''
         query = '''
             SELECT updated_at
             FROM pathways_program
@@ -157,33 +131,9 @@ class Transformer:
                 
                 return dataframe[dataframe['Timestamp'] > last_updated]
 
-
-    # FIX: We do not need this for pathways loading...
-    # def _intersect_columns(self, dataframe):
-    #     filtered_df = self._filter_last_updated(dataframe)
-    #     query = '''
-    #         SELECT column_name
-    #         FROM information_schema.columns
-    #         WHERE table_schema = 'public'
-    #         AND table_name = 'pathways_program';
-    #     '''
-    #     with self.engine.connect() as connection:
-    #         results = connection.execute(query)
-    #         table_columns = [desc[0] for desc in results.fetchall()]
-            
-    #         return filtered_df[filtered_df.columns.intersection(table_columns)]
-
-
     def transform(self):
         df = self._make_dataframe_with_headers()
-        # df_with_source = self._add_source_id(df)
-        # df_clean = self._clean_dataframe(df_with_source)
         df_with_valid_dates = self._handle_dates(df)
-
-        # Comment out until we add a Programs table to the Pathways API.
-        # loadable_df = self._intersect_columns(df_with_valid_dates)
         clean_df = self._filter_last_updated(df_with_valid_dates)
-
-        # return loadable_df
 
         return clean_df
