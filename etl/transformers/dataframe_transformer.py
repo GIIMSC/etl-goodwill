@@ -93,6 +93,7 @@ class DataframeTransformer:
                 
                 return dataframe[dataframe['Timestamp'] > last_updated]
 
+
     def transform(self):
         df = self._make_dataframe_with_headers()
         df_with_valid_dates = self._handle_dates(df)
