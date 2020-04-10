@@ -5,6 +5,19 @@ from etl.transformers.pathways_transformer import PathwaysTransformer
 from etl.utils.errors import InvalidPathwaysData
 
 
+def test_filter_non_pathways_programs():
+    df = pd.DataFrame({
+        'Program Name': ['Technical Academy Program', 'Sales Leadership'],
+        'Should this program be available in Google Pathways?': ['Yes', 'No']
+    })
+    transformer = PathwaysTransformer(dataframe=df)
+
+    filtered_df = transformer._filter_non_pathways_programs()
+
+    assert len(transformer.dataframe) == 2
+    assert len(filtered_df) == 1
+
+
 def test_make_prereq_blob_all():
     df = pd.DataFrame({
         'HS diploma required?': ['Yes'],

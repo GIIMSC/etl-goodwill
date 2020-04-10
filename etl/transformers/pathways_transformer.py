@@ -80,8 +80,14 @@ class PathwaysTransformer:
         return duration_in_isoformat
     
 
+    def _filter_non_pathways_programs(self):
+        return self.dataframe[self.dataframe['Should this program be available in Google Pathways?'] == 'Yes']
+
+
     def _convert_to_pathways_json(self):
-        for index, row in self.dataframe.iterrows():
+        df = self._filter_non_pathways_programs()
+
+        for index, row in df.iterrows():
             gs_row_identifier = getattr(row, 'Row Identifier (DO NOT EDIT)')
             provider_address = self._make_address_blob(row)
 
