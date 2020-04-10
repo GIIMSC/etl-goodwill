@@ -7,10 +7,10 @@ from etl.utils.errors import InvalidPathwaysData
 
 def test_make_prereq_blob_all():
     df = pd.DataFrame({
-        'IsDiplomaRequired': ['Yes'],
-        'EligibleGroups': ['Veteran'],
-        'MaxIncomeEligibility': ['40000'],
-        'Prerequisites': ['Reliable transportation']
+        'HS diploma required?': ['Yes'],
+        'Eligible groups': ['Veteran'],
+        'Maximum yearly household income to be eligible': ['40000'],
+        'Other prerequisites': ['Reliable transportation']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
@@ -25,10 +25,10 @@ def test_make_prereq_blob_all():
 
 def test_make_prereq_blob_one():
     df = pd.DataFrame({
-        'IsDiplomaRequired': ['Yes'],
-        'EligibleGroups': [''],
-        'MaxIncomeEligibility': [''],
-        'Prerequisites': ['']
+        'HS diploma required?': ['Yes'],
+        'Eligible groups': [''],
+        'Maximum yearly household income to be eligible': [''],
+        'Other prerequisites': ['']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
@@ -43,8 +43,8 @@ def test_make_prereq_blob_one():
 
 def test_make_address_blob_for_provider_and_program():
     df = pd.DataFrame({
-        'ProviderAddress': ['111 Grickle Grass Lane, Springfield MA 88884'],
-        'ProgramAddress': ['234 Mulberry Street, Chicago IL 74444']
+        'Organization Address': ['111 Grickle Grass Lane, Springfield MA 88884'],
+        'Program Address (if different from organization address)': ['234 Mulberry Street, Chicago IL 74444']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
@@ -58,8 +58,8 @@ def test_make_address_blob_for_provider_and_program():
 
 def test_make_address_blob_for_provider():
     df = pd.DataFrame({
-        'ProviderAddress': ['111 Grickle Grass Lane, Springfield MA 88884'],
-        'ProgramAddress': ['']
+        'Organization Address': ['111 Grickle Grass Lane, Springfield MA 88884'],
+        'Program Address (if different from organization address)': ['']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
