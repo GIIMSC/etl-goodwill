@@ -82,7 +82,6 @@ class PathwaysTransformer:
 
     def _convert_to_pathways_json(self):
         for index, row in self.dataframe.iterrows():
-        # for row in self.dataframe.itertuples(index=True, name='Pandas'):
             gs_row_identifier = getattr(row, 'Row Identifier (DO NOT EDIT)')
             provider_address = self._make_address_blob(row)
 
@@ -101,7 +100,7 @@ class PathwaysTransformer:
                     'program_url': getattr(row, 'URL of Program'), 
                     'provider_name': getattr(row, 'Organization Name'), 
                     'provider_url': getattr(row, 'Organization URL'), 
-                    'provider_telephone': getattr(row, 'Contact phone number for program'), 
+                    'provider_telephone': getattr(row, 'Contact phone number for program'),
                     'provider_address': provider_address, 
                     'start_date': getattr(row, 'Start date(s)'), # I think this is a list?
                     'end_date': getattr(row, 'End Date(s)'), # I think this is a list?
@@ -134,7 +133,7 @@ class PathwaysTransformer:
                     'program_url': getattr(row, 'URL of Program'), 
                     'provider_name': getattr(row, 'Organization Name'), 
                     'provider_url': getattr(row, 'Organization URL'), 
-                    'provider_telephone': getattr(row, 'Contact phone number for program'), 
+                    'provider_telephone': getattr(row, 'Contact phone number for program'),
                     'provider_address': provider_address, 
                     'time_to_complete': time_to_complete, 
                     'identifier_cip': getattr(row, 'CIP Code'), 

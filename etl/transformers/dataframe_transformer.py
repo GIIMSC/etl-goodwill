@@ -88,7 +88,7 @@ class DataframeTransformer:
             else:
                 try:
                     dataframe['Timestamp'] = pd.to_datetime(dataframe['Timestamp'], format='%m/%d/%Y %H:%M:%S')
-                except ValueError as e:
+                except ValueError:
                     dataframe['Timestamp'] = pd.to_datetime(dataframe['Timestamp'], format='%Y-%m-%d %H:%M:%S')
                 
                 return dataframe[dataframe['Timestamp'] > last_updated]

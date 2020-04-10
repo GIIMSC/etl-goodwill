@@ -23,7 +23,6 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
         logger.info('----Data found')
         dataframe = DataframeTransformer(
             sheet=sheet_as_list,
-            spreadsheet_id=spreadsheet_id,
             engine=engine
         ).transform()
 
