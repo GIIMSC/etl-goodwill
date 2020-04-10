@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import ResultProxy
 
 from config.config import SQLALCHEMY_DATABASE_URI
-from etl.transformers.transformer import Transformer
+from etl.transformers.dataframe_transformer import DataframeTransformer
 
 
 @pytest.fixture
@@ -107,7 +107,7 @@ def google_sheet_data():
 @pytest.fixture
 def transformer(google_sheet_data):
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    transformer = Transformer(sheet=google_sheet_data, engine=engine, spreadsheet_id='12345678')
+    transformer = DataframeTransformer(sheet=google_sheet_data, engine=engine)
 
     return transformer
 
@@ -121,7 +121,7 @@ def connection_mock():
         def __exit__(self, type, value, tb):
             pass
         
-        def execute(self, query, params):
+        def execute(self, query):
             return ResultProxy
     
     return ConnectionMock()

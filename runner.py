@@ -4,7 +4,7 @@ from config.config import (GOOGLE_DRIVE_CREDENTIALS, SPREADSHEET_IDS,
                            SQLALCHEMY_DATABASE_URI)
 from etl.extractor import Extractor
 from etl.loader import Loader
-from etl.transformers.transformer import Transformer
+from etl.transformers.dataframe_transformer import DataframeTransformer
 from etl.transformers.pathways_transformer import PathwaysTransformer
 from etl.utils.logger import logger
 
@@ -21,7 +21,7 @@ for goodwill, spreadsheet_id in SPREADSHEET_IDS.items():
 
     if sheet_as_list:
         logger.info('----Data found')
-        dataframe = Transformer(
+        dataframe = DataframeTransformer(
             sheet=sheet_as_list,
             spreadsheet_id=spreadsheet_id,
             engine=engine

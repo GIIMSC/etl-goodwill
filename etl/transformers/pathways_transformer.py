@@ -5,12 +5,11 @@ import usaddress
 
 from converter import (educational_occupational_programs_converter,
                        work_based_programs_converter)
-from etl.transformers.transformer import Transformer
 from etl.utils.errors import InvalidPathwaysData
 from etl.utils.logger import logger
 
 
-class PathwaysTransformer(Transformer):
+class PathwaysTransformer:
     def __init__(self, dataframe):
         self.dataframe = dataframe
 
@@ -163,8 +162,7 @@ class PathwaysTransformer(Transformer):
     def pathways_transform(self):
         '''
         This function consolidates the programs data into a "list of lists" (i.e., the same
-        data type the Google API resource returns). Thus, we can 
-        easily make use of the functions in the Transformer parent class.
+        data type the Google API resource returns). 
         '''
         list_of_lists = []
 
