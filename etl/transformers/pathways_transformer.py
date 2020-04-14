@@ -38,12 +38,13 @@ class PathwaysTransformer:
             street_address = f"{parsed_address.get('AddressNumber', '')} {parsed_address.get('StreetNamePreDirectional', '')} {parsed_address.get('StreetName', '')} {parsed_address.get('StreetNamePostType', '')}"
             street_address = re.sub(' +', ' ', street_address) # Replace double spaces with single space
 
-            return {
-                'street_address': street_address, 
-                'address_locality': parsed_address.get('PlaceName'), 
-                'address_region': parsed_address.get('StateName'), 
-                'postal_code': parsed_address.get('ZipCode')
-            }
+            if street_address and street_address is not ' ':
+                return {
+                    'street_address': street_address, 
+                    'address_locality': parsed_address.get('PlaceName'), 
+                    'address_region': parsed_address.get('StateName'), 
+                    'postal_code': parsed_address.get('ZipCode')
+                }
 
         provider_address_list = []
         provider_address = getattr(row, 'Organization Address')
@@ -51,17 +52,19 @@ class PathwaysTransformer:
         
         try:
             parsed_provider_address = parse_address(provider_address)
-            provider_address_list.append(parsed_provider_address)
+            if parsed_provider_address:
+                provider_address_list.append(parsed_provider_address)
         except Exception as err:
             logger.error(err)
 
         if program_address:
             try:
                 parsed_program_address = parse_address(program_address)
-                provider_address_list.append(parsed_program_address)
+                if parsed_program_address:
+                    provider_address_list.append(parsed_program_address)
             except Exception as err:
                 logger.error(err)
-        
+
         return provider_address_list
 
 
@@ -99,7 +102,6 @@ class PathwaysTransformer:
                 continue
 
             if getattr(row, 'Apprenticeship or Paid Training Available') == 'Yes':
-                import pdb; pdb.set_trace()
                 input_kwargs = {
                     'program_description': getattr(row, 'Program description'),
                     'program_name': getattr(row, 'Program Name'),
