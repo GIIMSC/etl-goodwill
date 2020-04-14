@@ -12,8 +12,8 @@ pandas = "*"
 google-api-python-client = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
-converter = {editable = true,git = "https://github.com/brighthive/google-pathways-converter.git",ref = "master"}
 usaddress = "*"
+converter = {editable = true,git = "https://github.com/brighthive/google-pathways-converter.git",ref = "master"}
 
 [requires]
 python_version = "3.7"
