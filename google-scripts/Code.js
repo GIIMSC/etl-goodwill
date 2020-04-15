@@ -6,9 +6,6 @@ function onSubmit(e) {
   if (!memberId) {
     return;
   }
-  // `getActiveSheet` returns a Sheet object (in this case, the Master sheet).
-  // https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#getactivesheet
-  // https://developers.google.com/apps-script/reference/spreadsheet/sheet.html
   var masterResponsesSheet = SpreadsheetApp.openById(MASTER_RESPONSES_SHEET).getActiveSheet();
   var masterHeaders = masterResponsesSheet.getRange(1, 1, 1, masterResponsesSheet.getMaxColumns());  
   var members = sheetToObjs(getMemberMappingsSheet());
@@ -22,12 +19,12 @@ function onSubmit(e) {
     newRowValues.push(uniqueRowIdentifier);
     var memberSheet = copyToMemberSheet(memberSheetId, masterHeaders, newRowValues);
 
-    subject = "Thank you for submitting the Goodwill Programs Data form";
-    email = "Your responses are shown below. To edit them, go to " + memberSheet.getUrl() + ".";
+    subject = "Thank you for submitting the Goodwill Programs Data form!";
+    email = "Thank you for submitting program data. You can edit your responses by visiting your local programs sheet: " + memberSheet.getUrl() + ". Your responses are shown below.";
   } else {
     subject = "There has been a problem with your form submission";
-    email = "Member id " + memberId + " has not been set up to enable programs data submission. " +
-      "Please check the member ID again. Your responses are shown below.";
+    email = "Goodwill organization '" + memberId + "' has not been set up to enable programs data submission. " +
+      "Your responses are shown below.";
   }
   email += "<br><br>" + constructEmailBody(FormApp.openByUrl(masterResponsesSheet.getFormUrl()), e.namedValues);
   
@@ -37,31 +34,6 @@ function onSubmit(e) {
     htmlBody: email,
     noReply: true
   });
-}
-
-function getMemberMappingsSheet() {
-  return SpreadsheetApp.openById(MEMBER_MAPPINGS_SHEET);
-}
-
-function sheetToObjs(sheet) {
-  var values = sheet.getDataRange().getValues();
-  
-  var data = [];
-  
-  // Start at row 1 to avoid headers
-  for (var i = 1; i < values.length; i++) {
-    var rowData = {};
-    for (var j = 0; j < values[i].length; j++) {
-      if (values[i][j]) {
-        rowData[values[0][j]] = values[i][j];
-      }
-    }
-    if (Object.keys(rowData).length > 0) {
-      data.push(rowData);
-    }
-  }
-  
-  return data;
 }
 
 function getMemberSheet(members, memberId) {
