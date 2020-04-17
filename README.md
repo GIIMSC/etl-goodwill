@@ -28,7 +28,7 @@ What if a local Goodwill needs to update a program? or makes a mistake filling o
 - do not edit the master google sheet
 - do not change or delete the `Row Identifier`
 
-[A time-driven trigger](https://developers.google.com/apps-script/guides/triggers/installable) (similar to a cron job) executes the `rewriteMasterSheet` script on a recurring basis. The `rewriteMasterSheet` script clears the master sheet and copies programs data from the local sheets: this insures that the master sheet reflects updates made at the local level.
+**[A time-driven trigger](https://developers.google.com/apps-script/guides/triggers/installable)** (similar to a cron job) executes the `rewriteMasterSheet` script on a recurring basis. The `rewriteMasterSheet` script clears the master sheet and copies programs data from the local sheets: this process insures that the master sheet reflects updates made at the local level. BrightHive [manually initialized](https://developers.google.com/apps-script/guides/triggers/installable#managing_triggers_manually) the trigger using the [production Google scripts UI](https://script.google.com/a/goodwill.org/d/1KRHoj07y0IR_brLgAQvUNx73iILdhDUUC9UK04qVqz18OhooOlOY8Vgq/edit) (Edit --> Current Project's Triggers). 
 
 ### Changing the Google scripts
 
