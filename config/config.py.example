@@ -1,0 +1,27 @@
+GOOGLE_DRIVE_CREDENTIALS = {
+    "type": "service_account",
+    "project_id": "xxxxxxxxxxxxxx",
+    "private_key_id": "xxxxxxxxxxxxxx",
+    "private_key": "xxxxxxxxxxxxxx",
+    "client_email": "xxxxxxxxxxxxxx",
+    "client_id": "xxxxxxxxxxxxxx",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "xxxxxxxxxxxxxx",
+}
+
+MASTER_SHEET_ID = "xxxxxxxxxxxxxx"
+
+POSTGRES_USER = 'brighthive'
+POSTGRES_PASSWORD = 'password'
+POSTGRES_HOSTNAME = 'localhost'
+POSTGRES_PORT = '5432' 
+POSTGRES_DATABASE = 'pathways'
+SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
+    POSTGRES_USER,
+    POSTGRES_PASSWORD,
+    POSTGRES_HOSTNAME,
+    POSTGRES_PORT,
+    POSTGRES_DATABASE
+)
