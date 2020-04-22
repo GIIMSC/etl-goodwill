@@ -17,17 +17,12 @@ class PathwaysTransformer:
     def _make_prereq_blob(self, row):
         prereq_blob = {}
 
-        if getattr(row, 'HS diploma required?'):
+        if getattr(row, 'HS diploma required?') == 'Yes':
             prereq_blob['credential_category'] = 'HighSchool'
         
         if getattr(row, 'Eligible groups'):
-            prereq_blob['eligible_groups'] = getattr(row, 'Eligible groups')
-        
-        if getattr(row, 'Maximum yearly household income to be eligible'):
-            prereq_blob['max_income_eligibility'] = getattr(row, 'Maximum yearly household income to be eligible')
-
-        if getattr(row, 'Other prerequisites'):
-            prereq_blob['other_program_prerequisites'] = getattr(row, 'Other prerequisites')
+            competency_description = f"Must belong to the following group(s): {getattr(row, 'Eligible groups')}"
+            prereq_blob['competency_required'] = competency_description
         
         return prereq_blob
 
