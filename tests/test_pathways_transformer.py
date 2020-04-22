@@ -29,7 +29,7 @@ def test_make_prereq_blob_all():
     results = transformer._make_prereq_blob(row)
 
     assert results['credential_category'] == 'HighSchool'
-    assert results['competency_required'] == 'Must belong to the following group(s): Veteran'
+    assert results['competency_required'] == 'Must belong to one or more of the following group(s): Veteran'
 
 
 def test_make_prereq_blob_credential():
@@ -56,7 +56,7 @@ def test_make_prereq_blob_competency():
 
     results = transformer._make_prereq_blob(row)
     
-    assert results['competency_required'] == 'Must belong to the following group(s): Veteran'
+    assert results['competency_required'] == 'Must belong to one or more of the following group(s): Veteran'
     assert 'credential_category' not in results
 
 

@@ -33,19 +33,17 @@ function testSheetToObjs(test) {
     
     t.equal(objs.length, 2, "2 objs created from sheet");
     t.equal(Object.keys(objs[0]).length, 3, "3 items in row 1")
-    t.equal(objs[0]["Member ID"], "one", "member one");
     t.equal(objs[0]["Spreadsheet ID"], "139uaTMu3TlfqZLzQB8fI7_5jRkHrEjqLDJ5QAgGp330", "member one ss");
     t.equal(objs[0]["Location"], "Somewhere, CA", "member one loc");
-    t.notOk(objs[1]["Member ID"], "row 1 missing member id");
   });
 }
 
 function testConstructEmailBody(test) {
   test('testConstructEmailBody', function(t) {
     var testForm = FormApp.openById("1rhs-y4VsRuL9q74-ErLlPOxu_msgVqp6-rv97bcvWSA");
-    var testResponses = {"Goodwill Member ID": "Somewhere, CA", "Format": "In person, Online", "Should this program be available in Google Pathways?": "Yes"};
+    var testResponses = {"Goodwill Member Name": "Somewhere, CA", "Format": "In person, Online", "Should this program be available in Google Pathways?": "Yes"};
     
-    var expectedEmailBody = "<b>Goodwill Info</b><br>Goodwill Member ID: Somewhere, CA<br>Should this program be available in Google Pathways?: Yes<br>Format: In person, Online<br>";
+    var expectedEmailBody = "<b>Goodwill Info</b><br>Goodwill Member Name: Somewhere, CA<br>Should this program be available in Google Pathways?: Yes<br>Format: In person, Online<br>";
     
     t.equal(constructEmailBody(testForm, testResponses), expectedEmailBody, "email matches expected");
   });
