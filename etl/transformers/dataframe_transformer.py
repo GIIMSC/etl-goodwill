@@ -1,7 +1,8 @@
 from datetime import datetime
 
-import numpy as np
 import pandas as pd
+
+from etl.utils.utils import make_dataframe_with_headers
 
 
 class DataframeTransformer:
@@ -17,16 +18,6 @@ class DataframeTransformer:
     def __init__(self, sheet, engine):
         self.sheet = sheet
         self.engine = engine
-
-    def _make_dataframe_with_headers(self):
-        """This function converts the list of lists into a Pandas dataframe
-        with headers (and without a zeroeth row that contains header names)."""
-        headers = self.sheet[0]
-
-        df = pd.DataFrame(self.sheet, columns=headers)
-        df.drop(df.index[0], inplace=True)
-
-        return df
 
     def _format_date(self, date: str):
         return datetime.strptime(date.strip(), "%m/%d/%Y").date().isoformat()
@@ -100,7 +91,7 @@ class DataframeTransformer:
                 return dataframe[dataframe["Timestamp"] > last_updated]
 
     def transform(self):
-        df = self._make_dataframe_with_headers()
+        df = make_dataframe_with_headers(self.sheet)
         df_with_valid_dates = self._handle_dates(df)
         clean_df = self._filter_last_updated(df_with_valid_dates)
 
