@@ -1,12 +1,12 @@
 function onSubmit(e) {
   Logger.log(e.namedValues);
   var memberId = String(e.namedValues['Goodwill Member Name']).trim();
-  
+
   if (!memberId) {
     return;
   }
   var masterResponsesSheet = SpreadsheetApp.openById(MASTER_RESPONSES_SHEET).getActiveSheet();
-  var masterHeaders = masterResponsesSheet.getRange(1, 1, 1, masterResponsesSheet.getMaxColumns());  
+  var masterHeaders = masterResponsesSheet.getRange(1, 1, 1, masterResponsesSheet.getMaxColumns());
   var members = sheetToObjs(getMemberMappingsSheet());
   var memberSheetId = getMemberSheet(members, memberId);
 
@@ -26,7 +26,7 @@ function onSubmit(e) {
       "Your responses are shown below.";
   }
   email += "<br><br>" + constructEmailBody(FormApp.openByUrl(masterResponsesSheet.getFormUrl()), e.namedValues);
-  
+
   MailApp.sendEmail({
     to: String(e.namedValues['Your email address']).trim(),
     subject: subject,
@@ -36,7 +36,7 @@ function onSubmit(e) {
 }
 
 function getMemberSheet(members, memberId) {
-  for (var i = 0; i < members.length; i++) {  
+  for (var i = 0; i < members.length; i++) {
     if (members[i]["Location"] == memberId) {
       return members[i]["Spreadsheet ID"];
     }
@@ -48,7 +48,7 @@ function copyToMemberSheet(memberSheetId, masterHeaders, newRow) {
   var memberSheet = SpreadsheetApp.openById(memberSheetId);
   var copyHeaders = memberSheet.getActiveSheet().getRange(1, 1, 1, masterHeaders.getNumColumns());
   copyHeaders.setRichTextValues(masterHeaders.getRichTextValues());
-  
+
   memberSheet.appendRow(newRow);
   return memberSheet;
 }
