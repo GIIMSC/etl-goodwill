@@ -1,0 +1,41 @@
+{
+  "bcp": {
+    "email": "",
+    "github": "",
+    "tier": 2
+  },
+  "description": "Scripts for the Goodwill programs data ETL process    ",
+  "live": false,
+  "name": "BrightHive Goodwill ETL",
+  "ops": {
+    "documentation": "",
+    "email": "",
+    "github": ""
+  },
+  "security": {
+    "audit": "",
+    "codereview": "",
+    "dependencies": "",
+    "dynamicanalysis": "",
+    "email": "",
+    "github": "",
+    "hippadata": false,
+    "linting": "",
+    "pcidata": false,
+    "pentest": "",
+    "piidata": true,
+    "securityrequirements": "",
+    "securityunittests": "",
+    "signal": "",
+    "soxdata": false,
+    "staticanalysis": "",
+    "threatmodel": "",
+    "tier": 1,
+    "training": ""
+  },
+  "support": {
+    "documentation": "https://github.com/brighthive/etl-goodwill",
+    "email": "",
+    "github": ""
+  }
+}

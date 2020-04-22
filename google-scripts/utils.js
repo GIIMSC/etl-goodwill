@@ -9,9 +9,9 @@ function getMemberMappingsSheet() {
 
 function sheetToObjs(sheet) {
   var values = sheet.getDataRange().getValues();
-  
+
   var data = [];
-  
+
   // Start at row 1 to avoid headers
   for (var i = 1; i < values.length; i++) {
     var rowData = {};
@@ -24,6 +24,6 @@ function sheetToObjs(sheet) {
       data.push(rowData);
     }
   }
-  
+
   return data;
 }
