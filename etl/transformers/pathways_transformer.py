@@ -21,7 +21,7 @@ class PathwaysTransformer:
             prereq_blob['credential_category'] = 'HighSchool'
         
         if getattr(row, 'Eligible groups'):
-            competency_description = f"Must belong to the following group(s): {getattr(row, 'Eligible groups')}"
+            competency_description = f"Must belong to one or more of the following group(s): {getattr(row, 'Eligible groups')}"
             prereq_blob['competency_required'] = competency_description
         
         return prereq_blob
