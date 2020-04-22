@@ -12,8 +12,7 @@ def google_sheet_data():
         [
             'Timestamp', 
             'Your email address',
-            'Goodwill Member ID',
-            'Organization Name',
+            'Goodwill Member Name',
             'Organization URL',
             'Organization Address',
             'Program Name',
@@ -58,7 +57,6 @@ def google_sheet_data():
         [
             '03/18/2020 07:25:37',
             'john@goodwill.test',
-            'Springfield, MA',
             'Goodwill of Springfield',
             'http://www.goodwill.test/',
             '1 Grickle Grass Lane Springfield, MA 88883',

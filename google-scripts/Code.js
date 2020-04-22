@@ -1,7 +1,6 @@
 function onSubmit(e) {
-  console.info(e.namedValues);
   Logger.log(e.namedValues);
-  var memberId = String(e.namedValues['Goodwill Member ID']).trim();
+  var memberId = String(e.namedValues['Goodwill Member Name']).trim();
   
   if (!memberId) {
     return;
