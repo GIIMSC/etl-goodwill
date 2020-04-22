@@ -21,9 +21,7 @@ def test_filter_non_pathways_programs():
 def test_make_prereq_blob_all():
     df = pd.DataFrame({
         'HS diploma required?': ['Yes'],
-        'Eligible groups': ['Veteran'],
-        'Maximum yearly household income to be eligible': ['40000'],
-        'Other prerequisites': ['Reliable transportation']
+        'Eligible groups': ['Veteran']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
@@ -31,17 +29,13 @@ def test_make_prereq_blob_all():
     results = transformer._make_prereq_blob(row)
 
     assert results['credential_category'] == 'HighSchool'
-    assert results['eligible_groups'] == 'Veteran'
-    assert results['max_income_eligibility'] == '40000'
-    assert results['other_program_prerequisites'] == 'Reliable transportation'
+    assert results['competency_required'] == 'Must belong to the following group(s): Veteran'
 
 
-def test_make_prereq_blob_one():
+def test_make_prereq_blob_credential():
     df = pd.DataFrame({
         'HS diploma required?': ['Yes'],
-        'Eligible groups': [''],
-        'Maximum yearly household income to be eligible': [''],
-        'Other prerequisites': ['']
+        'Eligible groups': ['']
     })
     transformer = PathwaysTransformer(dataframe=df)
     row = df.iloc[0]
@@ -49,9 +43,21 @@ def test_make_prereq_blob_one():
     results = transformer._make_prereq_blob(row)
 
     assert results['credential_category'] == 'HighSchool'
-    assert 'eligible_groups' not in results
-    assert 'max_income_eligibility' not in results
-    assert 'other_program_prerequisites' not in results
+    assert 'competency_required' not in results
+
+
+def test_make_prereq_blob_competency():
+    df = pd.DataFrame({
+        'HS diploma required?': ['No'],
+        'Eligible groups': ['Veteran']
+    })
+    transformer = PathwaysTransformer(dataframe=df)
+    row = df.iloc[0]
+
+    results = transformer._make_prereq_blob(row)
+    
+    assert results['competency_required'] == 'Must belong to the following group(s): Veteran'
+    assert 'credential_category' not in results
 
 
 def test_make_address_blob_for_provider_and_program():
