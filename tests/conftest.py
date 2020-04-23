@@ -1,10 +1,138 @@
-import pytest
-from sqlalchemy import create_engine, Table, MetaData
-from sqlalchemy.engine import ResultProxy
+from time import sleep
 
-from config.config import SQLALCHEMY_DATABASE_URI
-from etl.transformers.dataframe_transformer import DataframeTransformer
+import docker
+import pytest
+from sqlalchemy import Column, MetaData, Table, create_engine
+from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlalchemy.engine import ResultProxy
+from sqlalchemy.types import TIMESTAMP, String
+
+from config.config_test import (
+    CONTAINER_NAME,
+    POSTGRES_DATABASE,
+    POSTGRES_PASSWORD,
+    POSTGRES_PORT,
+    POSTGRES_USER,
+    SQLALCHEMY_DATABASE_URI,
+)
 from etl.pathways_opt_out import OptOut
+from etl.transformers.dataframe_transformer import DataframeTransformer
+from etl.utils.logger import logger
+
+ENGINE = create_engine(SQLALCHEMY_DATABASE_URI)
+
+
+class PostgreSQLContainer:
+    """A PostgreSQL Container Object.
+
+    This class provides a mechanism for managing PostgreSQL Docker
+    containers so that a database can be injected into tests. Class
+    Attributes:     config (object): A Configuration Factory object.
+    container (object): The Docker container object.     docker_client
+    (object): Docker client.     db_environment (list): Database
+    environment configuration variables.     db_ports (dict): Dictionary
+    of database port mappings.
+    """
+
+    def __init__(self):
+        self.container = None
+        self.docker_client = docker.from_env()
+        self.db_environment = [
+            "POSTGRES_USER={}".format(POSTGRES_USER),
+            "POSTGRES_PASSWORD={}".format(POSTGRES_PASSWORD),
+            "POSTGRES_DB={}".format(POSTGRES_DATABASE),
+        ]
+        self.db_ports = {"5432/tcp": POSTGRES_PORT}
+
+    def get_postgresql_image(self):
+        """Output the PostgreSQL image from the configuration.
+
+        Returns:
+            str: The PostgreSQL image name and version tag.
+        """
+        return "{}:{}".format("postgres", "12")
+
+    def start_container(self):
+        """Start PostgreSQL Container."""
+        if self.get_db_if_running():
+            return
+
+        try:
+            self.docker_client.images.pull(self.get_postgresql_image())
+        except Exception:
+            logger.error("Failed to pull postgres image")
+            raise RuntimeError
+
+        self.container = self.docker_client.containers.run(
+            self.get_postgresql_image(),
+            detach=True,
+            auto_remove=True,
+            name=CONTAINER_NAME,
+            environment=self.db_environment,
+            ports=self.db_ports,
+        )
+        logger.info("PostgreSQL container running!")
+
+        create_pathways_program_table()
+
+    def stop_if_running(self):
+        try:
+            running = self.docker_client.containers.get(CONTAINER_NAME)
+            logger.info(f"Killing running container '{CONTAINER_NAME}'")
+            running.stop()
+        except Exception as e:
+            if "404 Client Error: Not Found" in str(e):
+                return
+            raise e
+
+    def get_db_if_running(self):
+        """Return the container or None."""
+        try:
+            return self.docker_client.containers.get(CONTAINER_NAME)
+        except Exception as e:
+            if "404 Client Error: Not Found" in str(e):
+                return
+
+
+def create_pathways_program_table():
+    """Apply Database Migrations Applies the database migrations to the test
+    database container.
+
+    Args:
+        config (object): Configuration object to pull the needed components from.
+    """
+    table_created = False
+    retries = 0
+    max_retries = 3
+    metadata = MetaData()
+
+    programs_table = Table(
+        "pathways_program",
+        metadata,
+        Column("id", String, primary_key=True),
+        Column("pathways_program", JSONB, nullable=False),
+        Column("updated_at", TIMESTAMP, nullable=False),
+    )
+
+    while retries < max_retries and table_created is False:
+        logger.info(
+            "Attempting to apply migrations ({} of {})...".format(
+                retries + 1, max_retries
+            )
+        )
+        try:
+            metadata.create_all(ENGINE)
+            table_created = True
+        except Exception:
+            retries += 1
+            sleep(2)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def database():
+    postgres = PostgreSQLContainer()
+    yield postgres.start_container()
+    postgres.stop_if_running()
 
 
 @pytest.fixture
@@ -105,21 +233,19 @@ def google_sheet_data():
 
 @pytest.fixture
 def transformer(google_sheet_data):
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    transformer = DataframeTransformer(sheet=google_sheet_data, engine=engine)
+    transformer = DataframeTransformer(sheet=google_sheet_data, engine=ENGINE)
 
     return transformer
 
 
 @pytest.fixture
 def opt_out(google_sheet_data):
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    metadata = MetaData(bind=engine)
+    metadata = MetaData(bind=ENGINE)
     programs_table = Table("pathways_program", metadata)
     opt_out = OptOut(
         google_sheet_as_list=google_sheet_data,
         programs_table=programs_table,
-        engine=engine,
+        engine=ENGINE,
     )
 
     return opt_out

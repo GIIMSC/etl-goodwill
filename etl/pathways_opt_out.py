@@ -22,6 +22,17 @@ class OptOut:
             self.google_sheet_as_list
         )
 
+    def _find_programs_to_delete(self, all_programs_in_database, all_ids_in_sheet):
+        all_ids_in_database = [program.id for program in all_programs_in_database]
+
+        programs_to_delete = [
+            program_id
+            for program_id in all_ids_in_database
+            if program_id not in all_ids_in_sheet
+        ]
+
+        return programs_to_delete
+
     def remove_deleted_programs(self):
         """Delete programs from the database.
 
@@ -39,14 +50,11 @@ class OptOut:
             # 2. Get all IDs in the Pathways database
             select_all = select([self.programs_table])
             all_programs_in_database = connection.execute(select_all)
-            all_ids_in_database = [program.id for program in all_programs_in_database]
 
-            # 3. Determine if the database has IDs that the Google does not have
-            programs_to_delete = [
-                program_id
-                for program_id in all_ids_in_database
-                if program_id not in all_ids_in_sheet
-            ]
+            # 3. Determine if the Pathways database has IDs that the Google Sheet does not have
+            programs_to_delete = self._find_programs_to_delete(
+                all_programs_in_database, all_ids_in_sheet
+            )
 
             # 4. (OPTIONAL) Delete programs from Pathways database
             if programs_to_delete:
