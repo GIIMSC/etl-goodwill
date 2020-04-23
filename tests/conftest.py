@@ -1,9 +1,10 @@
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Table, MetaData
 from sqlalchemy.engine import ResultProxy
 
 from config.config import SQLALCHEMY_DATABASE_URI
 from etl.transformers.dataframe_transformer import DataframeTransformer
+from etl.pathways_opt_out import OptOut
 
 
 @pytest.fixture
@@ -108,6 +109,20 @@ def transformer(google_sheet_data):
     transformer = DataframeTransformer(sheet=google_sheet_data, engine=engine)
 
     return transformer
+
+
+@pytest.fixture
+def opt_out(google_sheet_data):
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    metadata = MetaData(bind=engine)
+    programs_table = Table("pathways_program", metadata)
+    opt_out = OptOut(
+        google_sheet_as_list=google_sheet_data,
+        programs_table=programs_table,
+        engine=engine,
+    )
+
+    return opt_out
 
 
 @pytest.fixture
