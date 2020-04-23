@@ -88,12 +88,13 @@ class OptOut:
             program for program in non_pathways_programs if program is not None
         ]
 
-        with self.engine.connect() as connection:
-            delete_object = self.programs_table.delete().where(
-                self.programs_table.c.id.in_(
-                    program for program in non_pathways_programs
+        if non_pathways_programs:
+            with self.engine.connect() as connection:
+                delete_object = self.programs_table.delete().where(
+                    self.programs_table.c.id.in_(
+                        program for program in non_pathways_programs
+                    )
                 )
-            )
-            connection.execute(delete_object)
+                connection.execute(delete_object)
 
         return non_pathways_programs
