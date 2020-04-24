@@ -134,6 +134,7 @@ def create_pathways_program_table():
             sleep(2)
 
 
+@pytest.fixture(scope="session", autouse=True)
 def pathways_program_table():
     return Table("pathways_program", METADATA_OBJECT, autoload=True)
 
@@ -147,7 +148,7 @@ def database():
     postgres.stop_if_running()
 
 
-@pytest.fixture(pathways_program_table, autouse=True)
+@pytest.fixture(autouse=True)
 def database_session():
     Session = sessionmaker()
     Session.configure(bind=ENGINE)
@@ -155,7 +156,8 @@ def database_session():
 
     yield session
 
-    delete_stmt = delete(pathways_program_table())
+    pathways_program_table = Table("pathways_program", METADATA_OBJECT, autoload=True)
+    delete_stmt = delete(pathways_program_table)
     session.execute(delete_stmt)
     session.commit()
     session.close()
@@ -265,12 +267,10 @@ def transformer(google_sheet_data):
 
 
 @pytest.fixture
-def opt_out(google_sheet_data):
-    programs_table = pathways_program_table()
-
+def opt_out(pathways_program_table, google_sheet_data):
     opt_out = OptOut(
         google_sheet_as_list=google_sheet_data,
-        programs_table=programs_table,
+        programs_table=pathways_program_table,
         engine=ENGINE,
     )
 
@@ -278,7 +278,7 @@ def opt_out(google_sheet_data):
 
 
 @pytest.fixture
-def pathways_programs(database_session):
+def pathways_programs(pathways_program_table, database_session):
     """A fixture that adds two programs to the database transaction (i.e.,
     SQLAlchemy session)."""
     json_ld_one = {
@@ -308,7 +308,7 @@ def pathways_programs(database_session):
     }
 
     # Create a SQLAlchemy Insert object
-    insert_obj = insert(pathways_program_table())
+    insert_obj = insert(pathways_program_table)
     insert_obj_with_values = insert_obj.values([program_data_one, program_data_two])
     database_session.execute(insert_obj_with_values)
     database_session.commit()

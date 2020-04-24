@@ -1,12 +1,10 @@
-import pytest
 import pandas as pd
+import pytest
+from sqlalchemy import select
 
 from etl.utils.utils import make_dataframe_with_headers
-from tests.models_for_testing import PathwaysProgram
 
-
-def test_truth(pathways_programs, opt_out):
-    assert True == True
+# from tests.models_for_testing import PathwaysProgram
 
 
 def test_init_with_dataframe(opt_out):
@@ -23,12 +21,15 @@ def test_remove_programs_not_marked_for_pathways(
     query_count,
     opt_out,
     database_session,
+    pathways_program_table,
     pathways_programs,
 ):
-    query_results = database_session.query(PathwaysProgram).filter(
-        PathwaysProgram.id == identifier
+    select_stmt = select([pathways_program_table]).where(
+        pathways_program_table.c.id == identifier
     )
-    assert len(query_results.all()) == 1
+    query_results = database_session.execute(select_stmt).fetchall()
+
+    assert len(query_results) == 1
 
     opt_out.dataframe_of_google_sheet = make_dataframe_with_headers(
         [
@@ -41,14 +42,16 @@ def test_remove_programs_not_marked_for_pathways(
     )
     opt_out.remove_programs_not_marked_for_pathways()
 
-    query_results = database_session.query(PathwaysProgram).filter(
-        PathwaysProgram.id == identifier
+    select_stmt = select([pathways_program_table]).where(
+        pathways_program_table.c.id == identifier
     )
-    assert len(query_results.all()) == query_count
+    query_results = database_session.execute(select_stmt).fetchall()
+
+    assert len(query_results) == query_count
 
 
 def test_remove_deleted_programs_no_deletion(
-    opt_out, database_session, pathways_programs
+    opt_out, database_session, pathways_program_table, pathways_programs
 ):
     """Test that when the Google sheet has the same IDs as the database that no
     deletions occur.
@@ -58,7 +61,9 @@ def test_remove_deleted_programs_no_deletion(
     program IDs. Thus, `remove_deleted_programs` should not remove any
     entries from the database.
     """
-    query_results = database_session.query(PathwaysProgram).all()
+    select_stmt = select([pathways_program_table])
+    query_results = database_session.execute(select_stmt).fetchall()
+
     assert len(query_results) == 2
 
     google_sheet_as_list = [
@@ -71,7 +76,9 @@ def test_remove_deleted_programs_no_deletion(
     )
     opt_out.remove_deleted_programs()
 
-    query_results = database_session.query(PathwaysProgram).all()
+    select_stmt = select([pathways_program_table])
+    query_results = database_session.execute(select_stmt).fetchall()
+
     assert len(query_results) == 2
 
     for program in query_results:
@@ -79,7 +86,7 @@ def test_remove_deleted_programs_no_deletion(
 
 
 def test_remove_deleted_programs_one_deletion(
-    opt_out, database_session, pathways_programs
+    opt_out, database_session, pathways_program_table, pathways_programs
 ):
     """Test that when the database has IDs not in the Google Sheet
     `remove_deleted_programs` removes those IDs.
@@ -89,7 +96,9 @@ def test_remove_deleted_programs_one_deletion(
     the program IDs. Thus, `remove_deleted_programs` should not remove
     one entry from the database.
     """
-    query_results = database_session.query(PathwaysProgram).all()
+    select_stmt = select([pathways_program_table])
+    query_results = database_session.execute(select_stmt).fetchall()
+
     assert len(query_results) == 2
 
     google_sheet_as_list = [["Row Identifier (DO NOT EDIT)"], ["5f109a01-87c6"]]
@@ -98,7 +107,9 @@ def test_remove_deleted_programs_one_deletion(
     )
     opt_out.remove_deleted_programs()
 
-    query_results = database_session.query(PathwaysProgram).all()
+    select_stmt = select([pathways_program_table])
+    query_results = database_session.execute(select_stmt).fetchall()
+
     assert len(query_results) == 1
 
     for program in query_results:
