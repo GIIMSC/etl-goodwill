@@ -1,4 +1,3 @@
-from sqlalchemy import MetaData, Table
 from sqlalchemy.dialects import postgresql
 
 from etl.utils.logger import logger
@@ -8,7 +7,7 @@ class Loader:
     def __init__(self, engine):
         self.engine = engine
 
-    def load_data(self, dataframe, table_name, primary_key):
+    def load_data(self, dataframe, metadata_table, primary_key):
         """This function uses `on_conflict_do_update` from
         `sqlalchemy.dialects.postgresql`, which runs a query against the
         programs table: it either INSERTS a new row, or it UPDATES existing
@@ -24,9 +23,6 @@ class Loader:
         """
         loadable_dict = dataframe.to_dict(orient="records")
 
-        metadata = MetaData(bind=self.engine)
-        programs_table = Table(table_name, metadata, autoload=True)
-
         for row in loadable_dict:
             row = {
                 field_name: None if not value else value
@@ -35,7 +31,7 @@ class Loader:
 
             with self.engine.connect() as connection:
                 try:
-                    sql_insert = postgresql.insert(programs_table).values(**row)
+                    sql_insert = postgresql.insert(metadata_table).values(**row)
                     sql_upsert = sql_insert.on_conflict_do_update(
                         index_elements=[primary_key], set_=row
                     )

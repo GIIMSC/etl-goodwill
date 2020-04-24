@@ -1,13 +1,7 @@
 import pytest
 from sqlalchemy.engine import Connection, Engine, ResultProxy, RowProxy
 
-
-def test_make_dataframe_with_headers(google_sheet_data, transformer):
-    df = transformer._make_dataframe_with_headers()
-    headers_in_dataframe = df.keys()
-
-    for header in headers_in_dataframe:
-        assert header in google_sheet_data[0]
+from etl.utils.utils import make_dataframe_with_headers
 
 
 @pytest.mark.parametrize(
@@ -40,7 +34,7 @@ def test_format_date_or_invalid(transformer, input, expected_output):
 
 
 def test_handle_dates(transformer):
-    df = transformer._make_dataframe_with_headers()
+    df = make_dataframe_with_headers(transformer.sheet)
     transformed_df = transformer._handle_dates(df)
 
     assert transformed_df["Application Deadline"][1] == "2021-01-15"
@@ -70,7 +64,7 @@ def test_filter_last_updated(
         return_value={"updated_at": database_last_updated},
     )
 
-    df = transformer._make_dataframe_with_headers()
+    df = make_dataframe_with_headers(transformer.sheet)
     full_df_count = df.shape[0]
 
     df = transformer._filter_last_updated(df)
