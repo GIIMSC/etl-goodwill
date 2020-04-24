@@ -4,8 +4,10 @@ import pandas as pd
 from etl.utils.utils import make_dataframe_with_headers
 from tests.models_for_testing import PathwaysProgram
 
+
 def test_truth(pathways_programs, opt_out):
     assert True == True
+
 
 def test_init_with_dataframe(opt_out):
     assert type(opt_out.dataframe_of_google_sheet) == pd.DataFrame

@@ -103,7 +103,7 @@ class PostgreSQLContainer:
 def create_pathways_program_table():
     """Create a PathwaysProgram table in the database.
 
-    This function instantiates a SQLAlchemy Table object and associates it with 
+    This function instantiates a SQLAlchemy Table object and associates it with
     the METADATA_OBJECT. Then, the function waits for Docker to standup the database
     and calls `create_all`, which calls "CREATE TABLE" for all associated tables.
     https://docs.sqlalchemy.org/en/13/core/tutorial.html#define-and-create-tables
@@ -112,12 +112,12 @@ def create_pathways_program_table():
     retries = 0
     max_retries = 3
 
-    programs_table = Table(	
-        "pathways_program",	
-        METADATA_OBJECT,	
-        Column("id", String, primary_key=True),	
-        Column("pathways_program", JSONB, nullable=False),	
-        Column("updated_at", TIMESTAMP, nullable=False),	
+    programs_table = Table(
+        "pathways_program",
+        METADATA_OBJECT,
+        Column("id", String, primary_key=True),
+        Column("pathways_program", JSONB, nullable=False),
+        Column("updated_at", TIMESTAMP, nullable=False),
     )
 
     while retries < max_retries and table_created is False:
