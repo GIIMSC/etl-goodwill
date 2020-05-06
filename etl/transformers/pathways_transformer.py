@@ -41,6 +41,7 @@ class PathwaysTransformer:
                     "address_locality": parsed_address.get("PlaceName"),
                     "address_region": parsed_address.get("StateName"),
                     "postal_code": parsed_address.get("ZipCode"),
+                    "address_country": "US",
                 }
 
         provider_address_list = []

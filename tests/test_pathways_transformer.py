@@ -77,12 +77,14 @@ def test_make_address_blob_for_provider_and_program():
             "street_address": "111 Grickle Grass Lane",
             "address_locality": "Springfield",
             "address_region": "MA",
+            "address_country": "US",
             "postal_code": "88884",
         },
         {
             "street_address": "234 Mulberry Street",
             "address_locality": "Chicago",
             "address_region": "IL",
+            "address_country": "US",
             "postal_code": "74444",
         },
     ]
@@ -107,6 +109,7 @@ def test_make_address_blob_for_provider():
             "street_address": "111 Grickle Grass Lane",
             "address_locality": "Springfield",
             "address_region": "MA",
+            "address_country": "US",
             "postal_code": "88884",
         }
     ]
