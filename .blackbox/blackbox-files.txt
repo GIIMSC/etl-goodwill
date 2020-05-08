@@ -1,1 +1,2 @@
+secrets/prod.config.py
 secrets/staging.config.py

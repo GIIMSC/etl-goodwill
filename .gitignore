@@ -7,3 +7,4 @@ etl_dagster/environments
 /.blackbox/pubring.kbx~
 /.blackbox/secring.gpg
 /secrets/staging.config.py
+/secrets/prod.config.py
