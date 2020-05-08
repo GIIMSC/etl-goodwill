@@ -3,3 +3,7 @@ __pycache__
 *config.py
 
 etl_dagster/environments
+/.blackbox/pubring.gpg~
+/.blackbox/pubring.kbx~
+/.blackbox/secring.gpg
+/secrets/staging.config.py
