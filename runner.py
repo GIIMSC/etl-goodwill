@@ -18,42 +18,44 @@ database schema and this makes available a Table object.
 
 Read more about database reflection: https://docs.sqlalchemy.org/en/13/core/reflection.html
 """
-engine = create_engine(SQLALCHEMY_DATABASE_URI)
-metadata = MetaData(bind=engine)
-programs_table = Table("pathways_program", metadata, autoload=True)
 
-logger.info("----Running ETL")
+logger.info("aksdfjlkjj!!!!")
+# engine = create_engine(SQLALCHEMY_DATABASE_URI)
+# metadata = MetaData(bind=engine)
+# programs_table = Table("pathways_program", metadata, autoload=True)
 
-sheet_as_list = Extractor(
-    google_account_info=GOOGLE_DRIVE_CREDENTIALS, spreadsheet_id=MASTER_SHEET_ID
-).get_sheet_as_list()
+# logger.info("----Running ETL")
 
-if sheet_as_list:
-    opt_out = OptOut(
-        google_sheet_as_list=sheet_as_list, programs_table=programs_table, engine=engine
-    )
-    deleted_records = opt_out.remove_deleted_programs()
-    logger.info(
-        f"----Deleted {len(deleted_records)} records from the Pathways database. {' '.join(deleted_records)}"
-    )
-    opt_out_records = opt_out.remove_programs_not_marked_for_pathways()
+# sheet_as_list = Extractor(
+#     google_account_info=GOOGLE_DRIVE_CREDENTIALS, spreadsheet_id=MASTER_SHEET_ID
+# ).get_sheet_as_list()
 
-    logger.info(
-        f"----Found {len(opt_out_records)} records that 'opt-out' of Pathways. {' '.join(opt_out_records)}"
-    )
+# if sheet_as_list:
+#     opt_out = OptOut(
+#         google_sheet_as_list=sheet_as_list, programs_table=programs_table, engine=engine
+#     )
+#     deleted_records = opt_out.remove_deleted_programs()
+#     logger.info(
+#         f"----Deleted {len(deleted_records)} records from the Pathways database. {' '.join(deleted_records)}"
+#     )
+#     opt_out_records = opt_out.remove_programs_not_marked_for_pathways()
 
-    dataframe = DataframeTransformer(sheet=sheet_as_list, engine=engine).transform()
-    logger.info(
-        f"----Initial transformation complete: {len(dataframe)} records prepped for PathwaysTransformer."
-    )
+#     logger.info(
+#         f"----Found {len(opt_out_records)} records that 'opt-out' of Pathways. {' '.join(opt_out_records)}"
+#     )
 
-    pathways_dataframe = PathwaysTransformer(dataframe=dataframe).pathways_transform()
-    logger.info(
-        f"----Pathways transformation complete: {len(pathways_dataframe)} records prepped for loading."
-    )
+#     dataframe = DataframeTransformer(sheet=sheet_as_list, engine=engine).transform()
+#     logger.info(
+#         f"----Initial transformation complete: {len(dataframe)} records prepped for PathwaysTransformer."
+#     )
 
-    loader = Loader(engine=engine)
-    loader.load_data(
-        dataframe=pathways_dataframe, metadata_table=programs_table, primary_key="id"
-    )
-    logger.info("----Data loaded into Google Pathways API")
+#     pathways_dataframe = PathwaysTransformer(dataframe=dataframe).pathways_transform()
+#     logger.info(
+#         f"----Pathways transformation complete: {len(pathways_dataframe)} records prepped for loading."
+#     )
+
+#     loader = Loader(engine=engine)
+#     loader.load_data(
+#         dataframe=pathways_dataframe, metadata_table=programs_table, primary_key="id"
+#     )
+#     logger.info("----Data loaded into Google Pathways API")
