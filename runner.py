@@ -1,4 +1,5 @@
 from sqlalchemy import MetaData, Table, create_engine
+from sqlalchemy.exc import OperationalError
 
 from config.config import (
     GOOGLE_DRIVE_CREDENTIALS,
@@ -7,20 +8,24 @@ from config.config import (
 )
 from etl.extractor import Extractor
 from etl.loader import Loader
+from etl.pathways_opt_out import OptOut
 from etl.transformers.dataframe_transformer import DataframeTransformer
 from etl.transformers.pathways_transformer import PathwaysTransformer
 from etl.utils.logger import logger
-from etl.pathways_opt_out import OptOut
-
 
 """This ETL process accesses the Pathways database via a SQLAlchemy MetaData object, which describes the
 database schema and this makes available a Table object.
 
 Read more about database reflection: https://docs.sqlalchemy.org/en/13/core/reflection.html
 """
+
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 metadata = MetaData(bind=engine)
-programs_table = Table("pathways_program", metadata, autoload=True)
+try:
+    programs_table = Table("pathways_program", metadata, autoload=True)
+except OperationalError as error:
+    logger.error(error)
+    raise
 
 logger.info("----Running ETL")
 

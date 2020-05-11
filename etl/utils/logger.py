@@ -1,13 +1,32 @@
 import logging
+import logging.config
 
+from config.config import SLACK_WEBHOOK_URL
+from webhook_logger.slack import SlackHandler
+from webhook_logger.slack import SlackFormatter
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "slack_format": {"()": "webhook_logger.slack.SlackFormatter"},
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "slack": {
+            "level": "INFO",
+            "class": "webhook_logger.slack.SlackHandler",
+            "hook_url": SLACK_WEBHOOK_URL,
+            "formatter": "slack_format",
+        },
+    },
+    "loggers": {"logger": {"handlers": ["console", "slack"], "level": "INFO"}},
+}
+
+logging.config.dictConfig(LOGGING)
 logger = logging.getLogger("logger")
-logger.setLevel("INFO")
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter(
-    fmt="[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%a, %d %b %Y %H:%M:%S"
-)
-handler.setFormatter(formatter)
-
-logger.addHandler(handler)
