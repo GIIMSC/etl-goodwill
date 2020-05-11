@@ -16,7 +16,6 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 usaddress = "*"
 converter = {editable = true,git = "https://github.com/brighthive/google-pathways-converter.git",ref = "master"}
-slacker-log-handler = "*"
 webhook-logger = "*"
 
 [requires]
