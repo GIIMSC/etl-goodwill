@@ -7,7 +7,7 @@ from webhook_logger.slack import SlackFormatter
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,  # What is this?
+    "disable_existing_loggers": False,
     "formatters": {
         "verbose": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
         "slack_format": {"()": "webhook_logger.slack.SlackFormatter"},
@@ -25,7 +25,7 @@ LOGGING = {
             "formatter": "slack_format",
         },
     },
-    "loggers": {"logger": {"handlers": ["console", "slack"], "level": "DEBUG"}},
+    "loggers": {"logger": {"handlers": ["console", "slack"], "level": "INFO"}},
 }
 
 logging.config.dictConfig(LOGGING)
