@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3d829ecca8ced56d358b97cde987da0b58dd1d2abf84d4ad1b1279c347cd34eb"
+            "sha256": "ea5cdfcd14e6c34d583ff38c7df94b0fedd9a342f9f9ab95081fdbc1fe07121a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -351,15 +351,23 @@
             ],
             "index": "pypi",
             "version": "==0.5.10"
+        },
+        "webhook-logger": {
+            "hashes": [
+                "sha256:88bd73410aac635cbcd9e5957f8ca8e41bca4267220b544aecb252095d3d2fe6",
+                "sha256:de1087da7f8fe35a6229fd86cd07871c427a55a91808d0599476c2d20e43581a"
+            ],
+            "index": "pypi",
+            "version": "==0.2.0"
         }
     },
     "develop": {
         "appdirs": {
             "hashes": [
-                "sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92",
-                "sha256:d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e"
+                "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41",
+                "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"
             ],
-            "version": "==1.4.3"
+            "version": "==1.4.4"
         },
         "attrs": {
             "hashes": [
