@@ -25,3 +25,5 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
     POSTGRES_PORT,
     POSTGRES_DATABASE
 )
+
+SLACK_WEBHOOK_URL = ""
