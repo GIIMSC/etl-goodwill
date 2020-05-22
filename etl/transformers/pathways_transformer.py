@@ -179,6 +179,7 @@ class PathwaysTransformer:
                         row,
                         "What certification (exam), license, or certificate (if any) does this program prepare you for or give you?",
                     ),
+                    "educational_program_mode": getattr(row, "Format"),
                     "maximum_enrollment": getattr(row, "Maximum Enrollment"),
                     "time_of_day": getattr(row, "Timing"),
                 }

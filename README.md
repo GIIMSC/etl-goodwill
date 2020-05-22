@@ -91,3 +91,23 @@ python runner.py
 ```
 
 Then, head over to the Google Pathways API (e.g., `http://localhost:8000/programs`) and view the newly imported programs.
+
+## Google Service Account
+
+The extraction scripts use a Google service account to make API calls to Google Sheets. Google describes a service account as ["a special kind of account used by an application or a virtual machine (VM) instance, not a person."](https://cloud.google.com/iam/docs/service-accounts?authuser=3) Access the service account by doing the following:
+
+1. Visit [the Google console](https://console.cloud.google.com/).
+2. Sign-in as `idc_pipeline@goodwill.org`.
+3. Select the `idc-apps-script` project.
+
+![project selection](https://github.com/brighthive/etl-goodwill/raw/master/readme_assets/project_selection.png)
+
+4. Select "IAM & Admin" --> "Service Accounts" in the left-hand nav.
+
+![find service accounts](https://github.com/brighthive/etl-goodwill/raw/master/readme_assets/find_service_accounts.png)
+
+5. Select the "goodwill_programs_data" service account, and perform actions as needed.
+
+## Team
+
+Regina Compton (Software Engineer)
