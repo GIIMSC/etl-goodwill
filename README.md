@@ -94,7 +94,7 @@ Then, head over to the Google Pathways API (e.g., `http://localhost:8000/program
 
 ## Google Service Account
 
-The extraction scripts use a Google service account (["a special kind of account used by an application or a virtual machine (VM) instance, not a person."](https://cloud.google.com/iam/docs/service-accounts?authuser=3)) to make API calls to Google Sheets. Access the service account by doing the following:
+The extraction scripts use a Google service account to make API calls to Google Sheets. Google describes a service account as ["a special kind of account used by an application or a virtual machine (VM) instance, not a person."](https://cloud.google.com/iam/docs/service-accounts?authuser=3) Access the service account by doing the following:
 
 1. Visit [the Google console](https://console.cloud.google.com/).
 2. Sign-in as `idc_pipeline@goodwill.org`.
