@@ -118,6 +118,47 @@ def test_make_address_blob_for_provider():
     assert expected_results == results
 
 
+def test_make_address_blob_for_multiple_addresses_with_pipe():
+    df = pd.DataFrame(
+        {
+            "Organization Address": ["234 Mulberry Street, Chicago IL 74444"],
+            "Program Address (if different from organization address)": [
+                "111 Grickle Grass Lane, Springfield MA 88884 | 3344 Lifted Lorax Street, Chicago IL 88884"
+            ],
+        }
+    )
+    transformer = PathwaysTransformer(dataframe=df)
+    row = df.iloc[0]
+
+    results = transformer._make_address_blob(row)
+    expected_results = [
+        {
+            "street_address": "234 Mulberry Street",
+            "address_locality": "Chicago",
+            "address_region": "IL",
+            "address_country": "US",
+            "postal_code": "74444",
+        },
+        {
+            "street_address": "111 Grickle Grass Lane",
+            "address_locality": "Springfield",
+            "address_region": "MA",
+            "address_country": "US",
+            "postal_code": "88884",
+        },
+        {
+            "street_address": "3344 Lifted Lorax Street",
+            "address_locality": "Chicago",
+            "address_region": "IL",
+            "address_country": "US",
+            "postal_code": "88884",
+        },
+    ]
+
+    assert len(results) == 3
+    assert expected_results == results
+
+
 @pytest.mark.parametrize(
     "input,expected_output",
     [("14 days", "P14D"), ("5 weeks", "P5W"), ("6 months", "P6M")],

@@ -58,6 +58,7 @@ class PathwaysTransformer:
             logger.error(err)
 
         if program_address:
+            # The `Program Address` question in the Google form asks Goodwills to delimit multiple programs with a pipe character ("|").
             program_address_as_list = program_address.split("|")
 
             for addr in program_address_as_list:
