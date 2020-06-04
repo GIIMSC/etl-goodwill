@@ -1,5 +1,5 @@
 function onSubmit(e) {
-  Logger.log(e.namedValues);
+  Logger.log("%s", JSON.stringify(e));
   var memberId = String(e.namedValues['Goodwill Member Name']).trim();
 
   if (!memberId) {
@@ -16,6 +16,18 @@ function onSubmit(e) {
     var uniqueRowIdentifier = create_UUID()
     var newRowValues = e.values
     newRowValues.push(uniqueRowIdentifier);
+
+    if (e.namedValues["Program ID"][0] === "") {
+      // This code updates `newRowValues` with a "Program ID" (i.e., index 7 of the array).
+      //
+      // Note! We know the "Program ID" occurs in the 7th position, because Column F
+      // in the spreadsheet stores the "Program ID."
+      // This could be determined dynamically, but since the sheet column order should remain
+      // largely static, it is not worth the effort to do so.
+      var generatedProgramID = "goodwill-prgm-" + uniqueRowIdentifier.slice(0, 8);
+      newRowValues[7] = generatedProgramID;
+    }
+
     var memberSheet = copyToMemberSheet(memberSheetId, masterHeaders, newRowValues);
 
     subject = "Thank you for submitting the Goodwill Programs Data form!";
