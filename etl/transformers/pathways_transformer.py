@@ -58,12 +58,15 @@ class PathwaysTransformer:
             logger.error(err)
 
         if program_address:
-            try:
-                parsed_program_address = parse_address(program_address)
-                if parsed_program_address:
-                    provider_address_list.append(parsed_program_address)
-            except Exception as err:
-                logger.error(err)
+            program_address_as_list = program_address.split("|")
+
+            for addr in program_address_as_list:
+                try:
+                    parsed_program_address = parse_address(addr)
+                    if parsed_program_address:
+                        provider_address_list.append(parsed_program_address)
+                except Exception as err:
+                    logger.error(err)
 
         return provider_address_list
 
