@@ -1,5 +1,5 @@
 function onSubmit(e) {
-  Logger.log(e.namedValues);
+  Logger.log("%s", JSON.stringify(e));
   var memberId = String(e.namedValues['Goodwill Member Name']).trim();
 
   if (!memberId) {
@@ -8,7 +8,7 @@ function onSubmit(e) {
   var masterResponsesSheet = SpreadsheetApp.openById(MASTER_RESPONSES_SHEET).getActiveSheet();
   var masterHeaders = masterResponsesSheet.getRange(1, 1, 1, masterResponsesSheet.getMaxColumns());
   var members = sheetToObjs(getMemberMappingsSheet());
-  var memberSheetId = getMemberSheet(members, memberId);
+  const [memberSheetId, shortName] = getMemberSheet(members, memberId);
 
   var email;
   var subject;
@@ -16,6 +16,19 @@ function onSubmit(e) {
     var uniqueRowIdentifier = create_UUID()
     var newRowValues = e.values
     newRowValues.push(uniqueRowIdentifier);
+
+    if (e.namedValues["Program ID"][0] === "") {
+      // This code updates `newRowValues` with a "Program ID" (i.e., index 7 of the array).
+      //
+      // Note! We know the "Program ID" occurs in the 7th position, because Column F
+      // in the spreadsheet stores the "Program ID."
+      // This could be determined dynamically, but since the sheet column order should remain
+      // largely static, it is not worth the effort to do so.
+      var randomNum = Math.floor(Math.random()*9000) + 1000;
+      var generatedProgramID = shortName + "-" + randomNum;
+      newRowValues[7] = generatedProgramID;
+    }
+
     var memberSheet = copyToMemberSheet(memberSheetId, masterHeaders, newRowValues);
 
     subject = "Thank you for submitting the Goodwill Programs Data form!";
@@ -38,7 +51,7 @@ function onSubmit(e) {
 function getMemberSheet(members, memberId) {
   for (var i = 0; i < members.length; i++) {
     if (members[i]["Location"] == memberId) {
-      return members[i]["Spreadsheet ID"];
+      return [members[i]["Spreadsheet ID"], members[i]["Short Name"]];
     }
   }
   return null;

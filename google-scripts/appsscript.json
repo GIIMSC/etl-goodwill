@@ -1,8 +1,9 @@
 {
-  "dependencies": {},
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
   "exceptionLogging": "STACKDRIVER",
   "executionApi": {
     "access": "DOMAIN"
-  },
-  "timeZone": "America/New_York"
+  }
 }
