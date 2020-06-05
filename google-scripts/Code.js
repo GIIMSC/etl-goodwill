@@ -24,7 +24,7 @@ function onSubmit(e) {
       // in the spreadsheet stores the "Program ID."
       // This could be determined dynamically, but since the sheet column order should remain
       // largely static, it is not worth the effort to do so.
-      var randomNum = Math.floor(Math.random()*9000) + 1000;
+      var randomNum = Math.floor(Math.random()*90000) + 100000;
       var generatedProgramID = shortName + "-" + randomNum;
       newRowValues[7] = generatedProgramID;
     }
