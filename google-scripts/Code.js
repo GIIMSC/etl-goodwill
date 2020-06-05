@@ -8,7 +8,7 @@ function onSubmit(e) {
   var masterResponsesSheet = SpreadsheetApp.openById(MASTER_RESPONSES_SHEET).getActiveSheet();
   var masterHeaders = masterResponsesSheet.getRange(1, 1, 1, masterResponsesSheet.getMaxColumns());
   var members = sheetToObjs(getMemberMappingsSheet());
-  var memberSheetId = getMemberSheet(members, memberId);
+  const [memberSheetId, shortName] = getMemberSheet(members, memberId);
 
   var email;
   var subject;
@@ -24,7 +24,8 @@ function onSubmit(e) {
       // in the spreadsheet stores the "Program ID."
       // This could be determined dynamically, but since the sheet column order should remain
       // largely static, it is not worth the effort to do so.
-      var generatedProgramID = "goodwill-prgm-" + uniqueRowIdentifier.slice(0, 8);
+      var randomNum = Math.floor(Math.random()*9000) + 1000;
+      var generatedProgramID = shortName + "-" + randomNum;
       newRowValues[7] = generatedProgramID;
     }
 
@@ -50,7 +51,7 @@ function onSubmit(e) {
 function getMemberSheet(members, memberId) {
   for (var i = 0; i < members.length; i++) {
     if (members[i]["Location"] == memberId) {
-      return members[i]["Spreadsheet ID"];
+      return [members[i]["Spreadsheet ID"], members[i]["Short Name"]];
     }
   }
   return null;
