@@ -122,10 +122,8 @@ class PathwaysTransformer:
                         row, "Contact phone number for program"
                     ),
                     "provider_address": provider_address,
-                    "start_date": getattr(
-                        row, "Start date(s)"
-                    ),  # I think this is a list?
-                    "end_date": getattr(row, "End Date(s)"),  # I think this is a list?
+                    "start_date": getattr(row, "Start date(s)"),
+                    "end_date": getattr(row, "End Date(s)"),
                     "maximum_enrollment": getattr(row, "Maximum Enrollment"),
                     "occupational_credential_awarded": getattr(
                         row,
