@@ -20,7 +20,12 @@ class DataframeTransformer:
         self.engine = engine
 
     def _format_date(self, date: str):
-        return datetime.strptime(date.strip(), "%m/%d/%Y").date().isoformat()
+        try:
+            strp_format_date = datetime.strptime(date.strip(), "%m/%d/%Y")
+        except ValueError:
+            strp_format_date = datetime.strptime(date.strip(), "%m/%d/%Y %H:%M:%S")
+
+        return strp_format_date.date().isoformat()
 
     def _format_startdates_and_enddates(self, dates: str):
         """The Goodwill intake form allows multiple responses for "Start
